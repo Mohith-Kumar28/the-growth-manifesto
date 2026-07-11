@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Reveal, StopMotion } from './reveal'
+import { Reveal } from './reveal'
 
 const FACTS = [
   {
@@ -65,12 +65,9 @@ export function Hero() {
 
         <dl className="mt-9 grid grid-cols-1 gap-12 sm:grid-cols-3 sm:gap-8">
           {FACTS.map((fact, i) => (
-            <StopMotion
+            <Reveal
               key={fact.kicker}
-              delay={i * 0.08}
-              dx={[-48, 0, 48][i]}
-              dy={[28, 72, 28][i]}
-              rot={[-6, 0, 6][i]}
+              delay={i * 0.1}
               className="flex flex-col items-center px-4 text-center"
             >
               <dt className="font-caslon text-[12px] tracking-[0.22em] text-gray/70 uppercase">
@@ -84,7 +81,7 @@ export function Hero() {
               <p className="mt-2 max-w-[240px] font-fell text-[15px] leading-snug text-gray md:text-[16px]">
                 {fact.description}
               </p>
-            </StopMotion>
+            </Reveal>
           ))}
         </dl>
       </div>

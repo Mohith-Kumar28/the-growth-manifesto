@@ -1,19 +1,8 @@
 import { motion } from 'framer-motion'
 import type { ReactNode } from 'react'
 
-/*
-  Stop-motion easing: progress advances in a few big discrete "hops" rather
-  than a smooth glide — the object visibly jumps into position frame by frame,
-  the way a stop-motion film moves a puppet. Only 3 frames (2 hops) so it reads
-  as deliberate motion, not glitchy flicker.
-*/
-const stepped =
-  (frames: number) =>
-  (t: number): number =>
-    Math.min(1, Math.floor(t * frames) / (frames - 1))
-
-const HOP = stepped(3)
 const VIEWPORT = { once: true, margin: '0px 0px -12% 0px' } as const
+const EASE_OUT = [0.22, 1, 0.36, 1] as const
 
 type RevealProps = {
   children: ReactNode
@@ -23,12 +12,12 @@ type RevealProps = {
   as?: 'div' | 'section' | 'li'
 }
 
-/** Text / block reveal — fades in, then settles up in a couple of hops. */
+/** Smooth, unobtrusive fade-and-rise for text and general blocks. */
 export function Reveal({
   children,
   className,
   delay = 0,
-  y = 26,
+  y = 24,
   as = 'div',
 }: RevealProps) {
   const MotionTag = motion[as]
@@ -38,41 +27,40 @@ export function Reveal({
       initial={{ opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={VIEWPORT}
-      transition={{
-        opacity: { duration: 0.18, delay },
-        y: { duration: 0.55, delay, ease: HOP },
-      }}
+      transition={{ duration: 0.6, delay, ease: EASE_OUT }}
     >
       {children}
     </MotionTag>
   )
 }
 
+/*
+  Stop-motion: the piece appears in a deliberately "wrong" pose — thrown off to
+  the side, tilted, undersized — then jumps into place in two hard cuts through
+  a single intermediate frame (3 poses, no interpolation). Big travel + few
+  decisive jumps reads as an intentional hand-placed animation, not a glitch.
+*/
+const SNAP = (t: number): number => (t < 0.34 ? 0 : t < 0.7 ? 0.5 : 1)
+
 type StopMotionProps = {
   children: ReactNode
   className?: string
   delay?: number
-  /** Starting offset (px) — the piece hops in FROM here. */
+  /** Starting offset (px) and tilt (deg) — the wild pose it snaps in from. */
   dx?: number
   dy?: number
-  /** Starting rotation (deg). */
   rot?: number
   scale?: number
 }
 
-/**
- * Punchy stop-motion entrance for images / diagrams / cards. The piece becomes
- * visible immediately, then hops into place through 2 discrete frames — from a
- * noticeable offset + rotation, so it clearly travels into position on scroll.
- */
 export function StopMotion({
   children,
   className,
   delay = 0,
   dx = 0,
-  dy = 72,
-  rot = -6,
-  scale = 0.9,
+  dy = 120,
+  rot = -14,
+  scale = 0.8,
 }: StopMotionProps) {
   return (
     <motion.div
@@ -81,11 +69,11 @@ export function StopMotion({
       whileInView={{ opacity: 1, x: 0, y: 0, rotate: 0, scale: 1 }}
       viewport={VIEWPORT}
       transition={{
-        opacity: { duration: 0.2, delay },
-        x: { duration: 0.62, delay, ease: HOP },
-        y: { duration: 0.62, delay, ease: HOP },
-        rotate: { duration: 0.62, delay, ease: HOP },
-        scale: { duration: 0.62, delay, ease: HOP },
+        opacity: { duration: 0.22, delay },
+        x: { duration: 0.5, delay, ease: SNAP },
+        y: { duration: 0.5, delay, ease: SNAP },
+        rotate: { duration: 0.5, delay, ease: SNAP },
+        scale: { duration: 0.5, delay, ease: SNAP },
       }}
     >
       {children}

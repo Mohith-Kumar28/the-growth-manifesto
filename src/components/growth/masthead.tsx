@@ -48,8 +48,14 @@ export function Masthead() {
           scrolled ? 'burnt-shadow' : ''
         }`}
       >
-        {/* Opaque burnt-paper background layer (behind the text). */}
-        <div className="burnt-bg" aria-hidden />
+        {/* Burnt-paper background — only in the condensed/scrolled state; the
+            expanded masthead at the top sits transparent on the page. */}
+        <div
+          className={`burnt-bg transition-opacity duration-500 ${
+            scrolled ? 'opacity-100' : 'opacity-0'
+          }`}
+          aria-hidden
+        />
 
         <div
           className={`relative z-10 px-6 transition-all duration-500 md:px-10 ${
