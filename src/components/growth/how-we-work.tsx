@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 
 type Step = {
   n: string
@@ -16,7 +17,7 @@ const STEPS: Array<Step> = [
     title: 'Discovery Call',
     desc: 'We surface your pain points, real barrier, and North Star plus product, ICP, and budget.',
     weeks: 'Weeks 1',
-    image: '/assets/growth/colosseum.png',
+    image: '/assets/growth/step1h.png',
     dotClass: 'bg-brand-red',
     weeksClass: 'text-brand-red',
   },
@@ -25,7 +26,7 @@ const STEPS: Array<Step> = [
     title: 'Growth Map',
     desc: 'A 90-day, channel-by-channel funnel, ranked by where your ICP actually is, with budget attached.',
     weeks: 'Weeks 1-2',
-    image: '/assets/growth/step2.png',
+    image: '/assets/growth/step2h.png',
     dotClass: 'bg-brand-gold',
     weeksClass: 'text-brand-gold',
   },
@@ -34,7 +35,7 @@ const STEPS: Array<Step> = [
     title: 'Execution Plan',
     desc: 'Once aligned: a week-by-week plan with the actions to run and KPIs we track weekly.',
     weeks: 'Weeks 2-3',
-    image: '/assets/growth/step3.png',
+    image: '/assets/growth/step3h.png',
     dotClass: 'bg-brand-green',
     weeksClass: 'text-brand-green',
   },
@@ -43,7 +44,7 @@ const STEPS: Array<Step> = [
     title: 'Execute & Review',
     desc: 'We ship, then review the KPIs together every week adjusting as we go.',
     weeks: 'Ongoing',
-    image: '/assets/growth/step4.png',
+    image: '/assets/growth/step4h.png',
     dotClass: 'bg-ink',
     weeksClass: 'text-ink',
   },
@@ -70,11 +71,11 @@ function StepHeader({ step }: { step: Step }) {
 
 function StepText({ step }: { step: Step }) {
   return (
-    <div className="flex max-w-[260px] flex-col items-end text-right">
-      <span className="font-caslon text-[52px] leading-none text-ink-soft md:text-[64px]">
+    <div className="flex max-w-[280px] flex-col items-end text-right">
+      <span className="font-caslon text-[56px] leading-none text-ink-soft md:text-[72px]">
         {step.n}
       </span>
-      <span className="mt-3 font-caslon text-[20px] text-ink">
+      <span className="mt-3 font-caslon text-[20px] text-ink md:text-[22px]">
         {step.title}
       </span>
       <p className="mt-5 font-fell text-[18px] leading-snug text-gray-body md:text-[20px]">
@@ -124,56 +125,45 @@ export function HowWeWork() {
       id="work-with"
       className="mx-auto w-full max-w-[1076px] px-6 md:px-10"
     >
-      {/* Desktop: pinned image that morphs step-by-step while the copy scrolls */}
+      {/* Desktop: image pins & morphs step-by-step while the copy swaps */}
       <div
         ref={containerRef}
         className="relative hidden md:block"
         style={{ height: `${STEPS.length * 100}vh` }}
       >
-        <div className="sticky top-0 flex h-screen flex-col justify-center py-10">
+        <div className="sticky top-0 flex h-screen flex-col justify-center py-16">
           <StepHeader step={STEPS[active]} />
 
-          <div className="mt-4 grid grid-cols-2 items-center gap-10">
-            <div className="relative aspect-[4/3]">
+          <div className="mt-2 grid grid-cols-[1.35fr_0.65fr] items-center gap-8">
+            <div className="relative -ml-[6%] aspect-[3/2]">
               {STEPS.map((s, i) => (
-                <img
+                <motion.img
                   key={s.n}
                   src={s.image}
                   alt={i === active ? `Step ${s.n}: ${s.title}` : ''}
                   aria-hidden={i !== active}
-                  className={`absolute inset-0 h-full w-full object-contain mix-blend-multiply transition-opacity duration-700 ease-out ${
-                    i === active ? 'opacity-100' : 'opacity-0'
-                  }`}
+                  initial={false}
+                  animate={{ opacity: i === active ? 1 : 0 }}
+                  transition={{ duration: 0.6, ease: 'easeInOut' }}
+                  className="absolute inset-0 h-full w-full object-contain mix-blend-multiply"
                 />
               ))}
             </div>
 
-            <div className="relative flex min-h-[280px] items-center justify-end">
-              {STEPS.map((s, i) => (
-                <div
-                  key={s.n}
-                  className={`absolute right-0 flex justify-end transition-all duration-700 ease-out ${
-                    i === active
-                      ? 'translate-y-0 opacity-100'
-                      : 'pointer-events-none translate-y-8 opacity-0'
-                  }`}
+            <div className="relative flex min-h-[300px] items-center justify-end">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={active}
+                  initial={{ opacity: 0, y: 22 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -22 }}
+                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                  className="flex justify-end"
                 >
-                  <StepText step={s} />
-                </div>
-              ))}
+                  <StepText step={STEPS[active]} />
+                </motion.div>
+              </AnimatePresence>
             </div>
-          </div>
-
-          {/* progress ticks */}
-          <div className="mt-10 flex justify-center gap-3">
-            {STEPS.map((s, i) => (
-              <span
-                key={s.n}
-                className={`h-1 rounded-full transition-all duration-500 ${
-                  i === active ? 'w-8 bg-ink' : 'w-4 bg-ink/25'
-                }`}
-              />
-            ))}
           </div>
         </div>
       </div>
@@ -186,9 +176,9 @@ export function HowWeWork() {
             <img
               src={s.image}
               alt={`Step ${s.n}: ${s.title}`}
-              className="mt-6 w-full object-contain mix-blend-multiply"
+              className="mt-4 w-full object-contain mix-blend-multiply"
             />
-            <div className="mt-6 flex justify-end">
+            <div className="mt-2 flex justify-end">
               <StepText step={s} />
             </div>
           </div>

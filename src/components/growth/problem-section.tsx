@@ -4,6 +4,7 @@ import {
   CompoundChart,
   CycleDiagram,
 } from './problem-diagrams'
+import { Reveal, StopMotion } from './reveal'
 
 type ProblemRowProps = {
   quote: string
@@ -62,12 +63,20 @@ function ProblemRow({
   )
   const art = (
     <div className="flex items-center justify-center">
-      <div className="w-full max-w-[460px]">{diagram}</div>
+      <StopMotion
+        delay={0.1}
+        dx={diagramFirst ? -40 : 40}
+        dy={44}
+        rot={diagramFirst ? -5 : 5}
+        className="w-full max-w-[460px]"
+      >
+        {diagram}
+      </StopMotion>
     </div>
   )
 
   return (
-    <div className="border border-rule">
+    <Reveal className="border border-rule" y={32}>
       <div className="grid grid-cols-1 items-center gap-10 border border-rule p-6 md:grid-cols-2 md:gap-0 md:divide-x md:divide-dashed md:divide-rule">
         <div className={diagramFirst ? 'md:order-2 md:pl-10' : 'md:pr-10'}>
           {text}
@@ -79,7 +88,7 @@ function ProblemRow({
       <p className="py-2 text-center font-fell text-[18px] text-ink md:text-[20px]">
         {caption}
       </p>
-    </div>
+    </Reveal>
   )
 }
 
@@ -89,7 +98,7 @@ export function ProblemSection() {
       id="problem"
       className="mx-auto w-full max-w-[1076px] px-6 pt-16 md:px-10 md:pt-24"
     >
-      <div className="flex flex-col items-center gap-5">
+      <Reveal className="flex flex-col items-center gap-5">
         <SectionBadge className="text-brand-red">
           ◉ Why Startups Don&rsquo;t Grow
         </SectionBadge>
@@ -97,7 +106,7 @@ export function ProblemSection() {
           <span className="text-ink-soft">One channel at a time. </span>
           <span className="text-brand-red">That&rsquo;s the trap.</span>
         </h2>
-      </div>
+      </Reveal>
 
       <div className="mt-10 flex flex-col gap-[30px]">
         <ProblemRow

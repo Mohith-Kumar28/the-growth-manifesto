@@ -1,4 +1,5 @@
 import { SectionBadge } from './section-badge'
+import { Reveal, StopMotion } from './reveal'
 
 type WorkCard = {
   image: string
@@ -49,7 +50,7 @@ const CARDS: Array<WorkCard> = [
 
 function WorkCardItem({ card }: { card: WorkCard }) {
   return (
-    <div className="flex flex-col">
+    <div className="flex w-full max-w-[270px] flex-col">
       <img
         src={card.image}
         alt={card.stat}
@@ -82,7 +83,7 @@ export function WorkCards() {
       </div>
 
       {/* Heading row */}
-      <div className="mt-8 grid grid-cols-1 gap-4 border-b border-rule pb-5 md:grid-cols-2 md:items-end">
+      <Reveal className="mt-8 grid grid-cols-1 gap-4 border-b border-rule pb-5 md:grid-cols-2 md:items-end">
         <h2 className="font-fell text-[28px] italic capitalize text-ink-soft md:text-[40px]">
           Not A Strategy Deck.
           <br />A Running System.
@@ -91,23 +92,23 @@ export function WorkCards() {
           Growth isn&rsquo;t one-size-fits-all. B2B AI, consumer AI, and
           product-led tools each need a different playbook. We run all three.
         </p>
-      </div>
+      </Reveal>
 
       {/* Cards */}
-      <div className="mt-10 grid grid-cols-1 gap-10 sm:grid-cols-3 sm:gap-0 sm:divide-x sm:divide-dashed sm:divide-rule">
+      <div className="mt-10 grid grid-cols-1 gap-y-12 sm:grid-cols-3 sm:gap-0">
         {CARDS.map((card, i) => (
-          <div
+          <StopMotion
             key={card.stat}
-            className={
-              i === 0
-                ? 'sm:pr-8'
-                : i === CARDS.length - 1
-                  ? 'sm:pl-8'
-                  : 'sm:px-8'
-            }
+            delay={i * 0.1}
+            dx={[-56, 0, 56][i]}
+            dy={[36, 84, 36][i]}
+            rot={[-5, 0, 5][i]}
+            className={`flex justify-center ${
+              i > 0 ? 'sm:border-l sm:border-dashed sm:border-rule' : ''
+            }`}
           >
             <WorkCardItem card={card} />
-          </div>
+          </StopMotion>
         ))}
       </div>
     </section>

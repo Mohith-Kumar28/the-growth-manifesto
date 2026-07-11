@@ -50,12 +50,77 @@ body,
 body {
   margin: 0;
   background-color: var(--color-paper-light);
-  background-image: url('/assets/growth/paper-texture.png');
-  background-repeat: repeat;
-  background-size: 1440px auto;
-  background-blend-mode: multiply;
   color: var(--color-ink);
   font-family: var(--font-fell);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+/* Newspaper grain — present and visible, sitting under all content. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url('/assets/growth/paper-texture.png');
+  background-repeat: repeat;
+  background-size: 1100px auto;
+  mix-blend-mode: multiply;
+  opacity: 0.55;
+}
+
+/* Infinite logo marquee */
+@keyframes tgm-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.tgm-marquee-track {
+  animation: tgm-marquee 38s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tgm-marquee-track {
+    animation: none;
+  }
+}
+
+/* Burnt / scorched aged-paper panel (masthead). The ragged edge comes from an
+   SVG displacement filter applied only to the background layer, so text stays
+   crisp. */
+.burnt-bg {
+  position: absolute;
+  inset: 0;
+  border-radius: 3px;
+  background-color: var(--color-paper-light);
+  background-image: url('/assets/growth/paper-texture.png');
+  background-size: 760px auto;
+  background-blend-mode: multiply;
+  border: 1.5px solid rgba(74, 45, 22, 0.45);
+  box-shadow:
+    inset 0 0 60px rgba(74, 42, 16, 0.16),
+    inset 0 0 14px rgba(52, 27, 8, 0.28),
+    inset 0 -22px 34px -20px rgba(52, 27, 8, 0.4);
+  filter: url(#tgm-burnt-edge);
+}
+.burnt-shadow {
+  box-shadow: 0 10px 26px -12px rgba(40, 22, 8, 0.4);
+}
+
+/* Lenis smooth scrolling */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
 }

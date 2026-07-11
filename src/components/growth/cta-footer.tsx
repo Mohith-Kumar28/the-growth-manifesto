@@ -1,101 +1,186 @@
+import { useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { ConfessionCard } from './confession-card'
+
 const SOCIALS = [
   { icon: '/assets/growth/icon-linkedin.svg', label: 'LinkedIn', href: '#' },
   { icon: '/assets/growth/icon-email.svg', label: 'Email', href: '#' },
   { icon: '/assets/growth/icon-twitter.svg', label: 'Twitter', href: '#' },
 ]
 
-function Postcard() {
+type TabKey = 'founders' | 'vc'
+
+const TABS: Record<
+  TabKey,
+  {
+    label: string
+    heading: string
+    subline: string
+    button: string
+    underline: string
+    accentText: string
+    accentBg: string
+    accentBorder: string
+  }
+> = {
+  founders: {
+    label: 'For Founders',
+    heading: 'Building an AI company that needs to own the US market?',
+    subline:
+      'We work with a small number of companies at any one time. Selective, deliberate, and unapologetic about it.',
+    button: 'Submit the case',
+    underline: '/assets/growth/tab-underline.svg',
+    accentText: 'text-brand-gold',
+    accentBg: 'bg-brand-gold',
+    accentBorder: 'focus:border-brand-gold',
+  },
+  vc: {
+    label: 'For VC Firms',
+    heading: 'Running a VC portfolio with AI companies ready to scale?',
+    subline:
+      'Portfolio partnerships available for firms with multiple companies that need the same distribution infrastructure.',
+    button: 'Explore a Portfolio Partnership',
+    underline: '/assets/growth/tab-underline-green.svg',
+    accentText: 'text-brand-green',
+    accentBg: 'bg-brand-green',
+    accentBorder: 'focus:border-brand-green',
+  },
+}
+
+function Field({
+  label,
+  type = 'text',
+  accent,
+}: {
+  label: string
+  type?: string
+  accent: string
+}) {
   return (
-    <div className="pointer-events-none absolute bottom-0 left-1/2 hidden w-[595px] max-w-[80vw] -translate-x-1/2 translate-y-[38%] -rotate-[4.7deg] md:block">
-      <div className="relative aspect-[595/380] w-full bg-[#e9e0c7] shadow-2xl">
-        <img
-          src="/assets/growth/postcard-paper.png"
-          alt=""
-          aria-hidden
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-        {/* framed photo */}
-        <div className="absolute top-[6%] left-[3%] h-[88%] w-[44%] border border-[#b6ac91] p-[3px]">
-          <div className="h-full w-full overflow-hidden border-[0.6px] border-[#b6ac91]">
-            <img
-              src="/assets/growth/postcard-photo.png"
-              alt="Vintage landscape photograph"
-              className="h-full w-full object-cover"
-            />
-          </div>
-        </div>
-        {/* right side writing area */}
-        <div className="absolute top-[8%] right-[4%] w-[48%]">
-          <p className="text-center font-fell text-[22px] italic text-[#b6ac91]">
-            Honest Confession
-          </p>
-          <p className="mt-8 font-fell text-[12px] italic text-[#b6ac91]">
-            Write your message here:
-          </p>
-          <div className="mt-2 space-y-3">
-            <span className="block h-px bg-[#b6ac91]/50" />
-            <span className="block h-px bg-[#b6ac91]/50" />
-            <span className="block h-px w-2/3 bg-[#b6ac91]/50" />
-          </div>
-          <p className="mt-6 font-fell text-[12px] italic text-[#b6ac91]">
-            Leave your unique mark:
-          </p>
-          <p className="font-fell text-[8px] text-[#b6ac91]">
-            A doodle, symbol or a mark
-          </p>
-        </div>
-      </div>
-    </div>
+    <label className="block text-left">
+      <span className="font-caslon text-[12px] tracking-wide text-card-cream/60 uppercase">
+        {label}
+      </span>
+      <input
+        type={type}
+        required
+        className={`mt-1 w-full border-b border-card-cream/30 bg-transparent pb-2 font-fell text-[16px] text-card-cream outline-none transition-colors placeholder:text-card-cream/30 ${accent}`}
+      />
+    </label>
   )
 }
 
 export function CtaFooter() {
+  const [tab, setTab] = useState<TabKey>('founders')
+  const [sent, setSent] = useState(false)
+  const t = TABS[tab]
+
   return (
-    <section className="mx-auto w-full max-w-[1140px] px-6 pt-20 pb-16 md:px-10 md:pt-28">
-      <div className="relative overflow-hidden rounded-sm bg-ink px-6 pt-14 pb-56 md:px-16 md:pt-20 md:pb-64">
+    <section className="mx-auto w-full max-w-[1140px] px-6 pt-24 pb-16 md:px-10 md:pt-32">
+      <div className="relative overflow-hidden rounded-sm bg-ink px-6 pt-14 pb-[46%] md:px-16 md:pt-20 md:pb-[26%]">
         {/* tabs */}
-        <div className="flex items-center justify-center gap-5">
-          <div className="relative">
-            <span className="font-caslon text-[22px] text-brand-gold md:text-[24px]">
-              For Founders
-            </span>
-            <img
-              src="/assets/growth/tab-underline.svg"
-              alt=""
-              aria-hidden
-              className="absolute -bottom-2 left-1/2 h-[6px] w-[160px] max-w-[120%] -translate-x-1/2"
-            />
-          </div>
-          <span className="font-caslon text-[22px] text-gray-body md:text-[24px]">
-            For VC Firms
-          </span>
+        <div className="flex items-center justify-center gap-6">
+          {(Object.keys(TABS) as Array<TabKey>).map((key) => {
+            const isActive = key === tab
+            return (
+              <button
+                key={key}
+                type="button"
+                onClick={() => setTab(key)}
+                className="relative pb-2"
+              >
+                <span
+                  className={`font-caslon text-[22px] transition-colors duration-300 md:text-[24px] ${
+                    isActive ? TABS[key].accentText : 'text-gray-body'
+                  }`}
+                >
+                  {TABS[key].label}
+                </span>
+                {isActive && (
+                  <motion.img
+                    layoutId="tab-underline"
+                    src={TABS[key].underline}
+                    alt=""
+                    aria-hidden
+                    className="absolute -bottom-0.5 left-1/2 h-[6px] w-[150px] max-w-[120%] -translate-x-1/2"
+                  />
+                )}
+              </button>
+            )
+          })}
         </div>
 
-        {/* heading + subline */}
-        <div className="mx-auto mt-14 max-w-[743px] text-center">
-          <h2 className="font-fell text-[26px] italic text-card-cream md:text-[33.7px]">
-            Building an AI company that needs to own the US market?
-          </h2>
-          <p className="mx-auto mt-3 max-w-[560px] font-fell text-[15px] leading-[1.65] text-card-cream md:text-[16px]">
-            We work with a small number of companies at any one time. Selective,
-            deliberate, and unapologetic about it.
-          </p>
+        {/* heading + subline (crossfade on tab change) */}
+        <div className="mx-auto mt-14 min-h-[130px] max-w-[743px] text-center">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={tab}
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -14 }}
+              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <h2 className="font-fell text-[26px] italic text-card-cream md:text-[33.7px]">
+                {t.heading}
+              </h2>
+              <p className="mx-auto mt-3 max-w-[560px] font-fell text-[15px] leading-[1.65] text-card-cream md:text-[16px]">
+                {t.subline}
+              </p>
+            </motion.div>
+          </AnimatePresence>
         </div>
 
-        {/* rule */}
-        <div className="mx-auto mt-14 max-w-[743px] border-t border-card-cream/60" />
-
-        {/* button */}
-        <div className="mt-10 flex justify-center">
-          <a
-            href="#"
-            className="inline-flex items-center gap-2 bg-brand-gold px-8 py-3.5 font-fell text-[12px] tracking-[2px] text-paper-rect uppercase transition-opacity hover:opacity-90"
-          >
-            Submit the case
-            <span aria-hidden className="rotate-90">
-              ➤
-            </span>
-          </a>
+        {/* form */}
+        <div className="mx-auto mt-10 max-w-[620px]">
+          <AnimatePresence mode="wait">
+            {sent ? (
+              <motion.p
+                key="sent"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="border-t border-card-cream/30 pt-10 text-center font-fell text-[18px] italic text-card-cream"
+              >
+                Thank you — we&rsquo;ll be in touch shortly.
+              </motion.p>
+            ) : (
+              <motion.form
+                key="form"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  setSent(true)
+                }}
+              >
+                <div className="grid gap-6 sm:grid-cols-2">
+                  <Field label="Name" accent={t.accentBorder} />
+                  <Field label="Email" type="email" accent={t.accentBorder} />
+                </div>
+                <div className="mt-6">
+                  <Field
+                    label={
+                      tab === 'founders'
+                        ? 'What are you building?'
+                        : 'Tell us about your portfolio'
+                    }
+                    accent={t.accentBorder}
+                  />
+                </div>
+                <div className="mt-9 flex justify-center">
+                  <button
+                    type="submit"
+                    className={`inline-flex items-center gap-2 px-8 py-3.5 font-fell text-[12px] tracking-[2px] text-paper-rect uppercase transition-opacity hover:opacity-90 ${t.accentBg}`}
+                  >
+                    {t.button}
+                    <span aria-hidden className="rotate-90">
+                      ➤
+                    </span>
+                  </button>
+                </div>
+              </motion.form>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* bottom bar: socials + monogram */}
@@ -129,7 +214,7 @@ export function CtaFooter() {
           </div>
         </div>
 
-        <Postcard />
+        <ConfessionCard />
       </div>
     </section>
   )
