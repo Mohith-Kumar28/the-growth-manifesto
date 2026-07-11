@@ -99,10 +99,11 @@ export function WorkCards() {
         {CARDS.map((card, i) => (
           <StopMotion
             key={card.stat}
-            delay={i * 0.1}
-            dx={[-56, 0, 56][i]}
-            dy={[36, 84, 36][i]}
-            rot={[-5, 0, 5][i]}
+            delay={i * 0.12}
+            dx={[-150, 30, 150][i]}
+            dy={[70, 180, 90][i]}
+            rot={[-16, 12, 18][i]}
+            scale={0.72}
             className={`flex justify-center ${
               i > 0 ? 'sm:border-l sm:border-dashed sm:border-rule' : ''
             }`}

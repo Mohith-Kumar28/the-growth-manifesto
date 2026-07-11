@@ -65,9 +65,10 @@ function ProblemRow({
     <div className="flex items-center justify-center">
       <StopMotion
         delay={0.1}
-        dx={diagramFirst ? -40 : 40}
-        dy={44}
-        rot={diagramFirst ? -5 : 5}
+        dx={diagramFirst ? -130 : 130}
+        dy={60}
+        rot={diagramFirst ? -14 : 14}
+        scale={0.78}
         className="w-full max-w-[460px]"
       >
         {diagram}
