@@ -1,5 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=IM+Fell+DW+Pica:ital@0;1&family=IM+Fell+English:ital@0;1&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Poly:ital@0;1&family=Press+Start+2P&family=UnifrakturMaguntia&display=swap');
+@import 'tailwindcss';
 
-@import "tailwindcss";
+/*
+  Design tokens for "The Growth Manifesto" — a vintage newspaper / editorial
+  landing page. Palette and typography mirror the Figma source.
+
+  Font mapping (Figma -> web):
+    Chomsky           -> UnifrakturMaguntia (blackletter nameplate)
+    IM FELL DW Pica   -> IM Fell DW Pica (exact)
+    IM FELL English   -> IM Fell English (exact)
+    Caslon Ionic Web  -> Libre Caslon Text (closest open substitute)
+    Press Start 2P    -> Press Start 2P (exact)
+    Poly              -> Poly (exact)
+*/
+@theme {
+  --font-fell: 'IM Fell DW Pica', Georgia, serif;
+  --font-fell-eng: 'IM Fell English', Georgia, serif;
+  --font-caslon: 'Libre Caslon Text', Georgia, serif;
+  --font-chomsky: 'UnifrakturMaguntia', 'Libre Caslon Text', serif;
+  --font-pixel: 'Press Start 2P', monospace;
+  --font-poly: 'Poly', Georgia, serif;
+
+  --color-paper: #f7f1de;
+  --color-paper-light: #fff9e2;
+  --color-paper-badge: #fffbe9;
+  --color-paper-rect: #f7f1db;
+  --color-ink: #1c1710;
+  --color-ink-soft: #383838;
+  --color-gray: #515151;
+  --color-gray-body: #747474;
+  --color-rule: #c8bfa8;
+  --color-brand-red: #8b1a1a;
+  --color-brand-gold: #b8902a;
+  --color-brand-green: #2c643c;
+  --color-brand-blue: #0556e3;
+  --color-card-cream: #f5efd9;
+}
 
 * {
   box-sizing: border-box;
@@ -13,5 +49,13 @@ body,
 
 body {
   margin: 0;
+  background-color: var(--color-paper-light);
+  background-image: url('/assets/growth/paper-texture.png');
+  background-repeat: repeat;
+  background-size: 1440px auto;
+  background-blend-mode: multiply;
+  color: var(--color-ink);
+  font-family: var(--font-fell);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
-
