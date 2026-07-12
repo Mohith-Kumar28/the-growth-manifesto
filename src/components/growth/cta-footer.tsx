@@ -208,9 +208,18 @@ export function CtaFooter() {
                     className={`inline-flex items-center gap-2 px-8 py-3.5 font-fell text-[12px] tracking-[2px] text-paper-rect uppercase transition-opacity hover:opacity-90 ${t.accentBg}`}
                   >
                     {t.button}
-                    <span aria-hidden className="rotate-90">
-                      ➤
-                    </span>
+                    <svg
+                      aria-hidden
+                      viewBox="0 0 24 24"
+                      className="h-3 w-3"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M5 12h14M13 6l6 6-6 6" />
+                    </svg>
                   </button>
                 </div>
               </motion.form>
@@ -218,8 +227,9 @@ export function CtaFooter() {
           </AnimatePresence>
         </div>
 
-        {/* bottom bar: socials + confessions link + monogram */}
-        <div className="mt-16 flex items-end justify-between">
+        {/* bottom bar: socials + confessions link + monogram — sits low, just
+            above the bleeding postcard (matches Figma) */}
+        <div className="mt-28 flex items-end justify-between md:mt-44">
           <div className="flex items-center gap-5">
             {SOCIALS.map((s) => (
               <a key={s.label} href={s.href} aria-label={s.label}>
@@ -235,25 +245,11 @@ export function CtaFooter() {
             View all confessions →
           </Link>
 
-          <div className="flex w-[150px] flex-col items-center gap-1">
-            <img
-              src="/assets/growth/ornament-top.svg"
-              alt=""
-              aria-hidden
-              className="h-[44px] w-[150px]"
-            />
-            <img
-              src="/assets/growth/monogram.svg"
-              alt="The Growth Manifesto monogram"
-              className="h-[35px] w-[133px]"
-            />
-            <img
-              src="/assets/growth/ornament-bottom.svg"
-              alt=""
-              aria-hidden
-              className="h-[22px] w-[112px]"
-            />
-          </div>
+          <img
+            src="/assets/growth/tgm-logo.svg"
+            alt="The Growth Manifesto — T.G.M. monogram"
+            className="h-auto w-[172px]"
+          />
         </div>
 
         <ConfessionCard />

@@ -8,10 +8,15 @@ const NAV_ITEMS = [
 ]
 
 export function Masthead() {
-  const [scrolled, setScrolled] = useState(false)
+  const [scrolled, setScrolled] = useState(false) // condensed size
+  const [hasBg, setHasBg] = useState(false) // paper backing visible
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 120)
+    const onScroll = () => {
+      const y = window.scrollY
+      setHasBg(y > 48)
+      setScrolled(y > 130)
+    }
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
@@ -19,8 +24,8 @@ export function Masthead() {
 
   return (
     <header
-      className={`sticky top-0 z-50 px-4 transition-all duration-500 md:px-6 ${
-        scrolled ? 'pt-2' : 'pt-3 md:pt-4'
+      className={`sticky top-0 z-50 px-4 transition-all duration-[600ms] md:px-6 ${
+        hasBg ? 'pt-0' : 'pt-3 md:pt-4'
       }`}
     >
       {/* Displacement filter that gives the paper its ragged, burnt edge. */}
@@ -44,26 +49,31 @@ export function Masthead() {
       </svg>
 
       <div
-        className={`relative mx-auto w-full max-w-[1140px] transition-shadow duration-500 ${
-          scrolled ? 'burnt-shadow' : ''
+        className={`relative mx-auto w-full max-w-[1140px] transition-shadow duration-[600ms] ${
+          hasBg ? 'burnt-shadow' : ''
         }`}
       >
-        {/* Burnt-paper background — only in the condensed/scrolled state; the
-            expanded masthead at the top sits transparent on the page. */}
+        {/* Paper backing appears on any scroll so content never bleeds through
+            the transparent/torn masthead; at the very top it's transparent. */}
         <div
-          className={`burnt-bg transition-opacity duration-500 ${
-            scrolled ? 'opacity-100' : 'opacity-0'
+          className={`transition-opacity duration-[700ms] ease-out ${
+            hasBg ? 'opacity-100' : 'opacity-0'
           }`}
           aria-hidden
-        />
+        >
+          {/* solid backing — torn notches reveal paper, not the page content */}
+          <div className="burnt-base" />
+          {/* ragged/scorched top layer */}
+          <div className="burnt-bg" />
+        </div>
 
         <div
-          className={`relative z-10 px-6 transition-all duration-500 md:px-10 ${
+          className={`relative z-10 px-6 transition-all duration-[600ms] md:px-10 ${
             scrolled ? 'py-2' : 'pt-6 pb-3 md:pt-7'
           }`}
         >
           <p
-            className={`overflow-hidden text-center font-fell tracking-[0.23em] text-black uppercase transition-all duration-500 md:tracking-[3.68px] ${
+            className={`overflow-hidden text-center font-fell tracking-[0.23em] text-black uppercase transition-all duration-[600ms] md:tracking-[3.68px] ${
               scrolled
                 ? 'max-h-0 text-[0px] opacity-0'
                 : 'max-h-8 text-[13px] opacity-100 sm:text-[15px] md:text-[16px]'
@@ -76,7 +86,7 @@ export function Masthead() {
           <button
             type="button"
             onClick={() => scrollToId('top')}
-            className={`block w-full text-center font-chomsky leading-none text-black transition-all duration-500 ${
+            className={`block w-full text-center font-chomsky leading-none text-black transition-all duration-[600ms] ${
               scrolled
                 ? 'text-[24px] sm:text-[30px] md:text-[34px]'
                 : 'mt-2 text-[22px] min-[400px]:text-[28px] sm:text-[46px] md:text-[62px] lg:text-[75px]'
@@ -86,7 +96,7 @@ export function Masthead() {
           </button>
 
           <div
-            className={`border-y border-ink/80 transition-all duration-500 ${
+            className={`border-y border-ink/80 transition-all duration-[600ms] ${
               scrolled ? 'mt-2 py-0.5' : 'mt-4 py-1 md:mt-5'
             }`}
           >
