@@ -227,10 +227,10 @@ export function CtaFooter() {
           </AnimatePresence>
         </div>
 
-        {/* bottom bar: socials + confessions link + monogram — sits low, just
-            above the bleeding postcard (matches Figma) */}
-        <div className="mt-28 flex items-end justify-between md:mt-44">
-          <div className="flex items-center gap-5">
+        {/* bottom bar: confessions link stays centered above the postcard;
+            socials + monogram drop to the bottom corners, flanking it (md+) */}
+        <div className="mt-28 flex items-end justify-between md:mt-44 md:justify-center">
+          <div className="flex items-center gap-5 md:absolute md:bottom-12 md:left-16">
             {SOCIALS.map((s) => (
               <a key={s.label} href={s.href} aria-label={s.label}>
                 <img src={s.icon} alt={s.label} className="h-8 w-8" />
@@ -248,7 +248,7 @@ export function CtaFooter() {
           <img
             src="/assets/growth/tgm-logo.svg"
             alt="The Growth Manifesto — T.G.M. monogram"
-            className="h-auto w-[172px]"
+            className="h-auto w-[172px] md:absolute md:bottom-12 md:right-16"
           />
         </div>
 
