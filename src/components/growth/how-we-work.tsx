@@ -125,17 +125,18 @@ export function HowWeWork() {
       id="work-with"
       className="mx-auto w-full max-w-[1076px] px-6 md:px-10"
     >
-      {/* Desktop: image pins & morphs step-by-step while the copy swaps */}
+      {/* Image pins & morphs step-by-step while the copy swaps; on mobile the
+          same effect runs with the image and copy stacked vertically */}
       <div
         ref={containerRef}
-        className="relative hidden md:block"
+        className="relative"
         style={{ height: `${STEPS.length * 100}vh` }}
       >
-        <div className="sticky top-0 flex h-screen flex-col justify-center py-16">
+        <div className="sticky top-0 flex h-svh flex-col justify-center py-10 md:h-screen md:py-16">
           <StepHeader step={STEPS[active]} />
 
-          <div className="mt-2 grid grid-cols-[1.35fr_0.65fr] items-center gap-8">
-            <div className="relative -ml-[6%] aspect-[3/2]">
+          <div className="mt-2 grid grid-cols-1 items-center gap-2 md:grid-cols-[1.35fr_0.65fr] md:gap-8">
+            <div className="relative aspect-[3/2] md:-ml-[6%]">
               {STEPS.map((s, i) => (
                 <motion.img
                   key={s.n}
@@ -152,7 +153,7 @@ export function HowWeWork() {
               ))}
             </div>
 
-            <div className="relative flex min-h-[300px] items-center justify-end">
+            <div className="relative flex min-h-[220px] items-center justify-end md:min-h-[300px]">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={active}
@@ -168,25 +169,6 @@ export function HowWeWork() {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Mobile: the same steps stacked vertically */}
-      <div className="py-14 md:hidden">
-        {STEPS.map((s) => (
-          <div key={s.n} className="mb-16 last:mb-0">
-            <StepHeader step={s} />
-            <img
-              src={s.image}
-              alt={`Step ${s.n}: ${s.title}`}
-              loading="lazy"
-              decoding="async"
-              className="mt-4 w-full object-contain mix-blend-multiply"
-            />
-            <div className="mt-2 flex justify-end">
-              <StepText step={s} />
-            </div>
-          </div>
-        ))}
       </div>
     </section>
   )

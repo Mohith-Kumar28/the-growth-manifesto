@@ -229,8 +229,8 @@ export function CtaFooter() {
 
         {/* bottom bar: confessions link stays centered above the postcard;
             socials + monogram drop to the bottom corners, flanking it (md+) */}
-        <div className="mt-28 flex items-end justify-between md:mt-44 md:justify-center">
-          <div className="flex items-center gap-5 md:absolute md:bottom-12 md:left-16">
+        <div className="mt-20 flex flex-wrap items-center justify-between gap-y-12 md:mt-44 md:justify-center">
+          <div className="flex flex-col items-start gap-4 md:absolute md:bottom-12 md:left-16 md:flex-row md:items-center md:gap-5">
             {SOCIALS.map((s) => (
               <a key={s.label} href={s.href} aria-label={s.label}>
                 <img src={s.icon} alt={s.label} className="h-8 w-8" />
@@ -238,18 +238,18 @@ export function CtaFooter() {
             ))}
           </div>
 
-          <Link
-            to="/confessions"
-            className="hidden font-caslon text-[15px] text-brand-gold underline-offset-4 transition-opacity hover:opacity-70 hover:underline sm:block"
-          >
-            View all confessions →
-          </Link>
-
           <img
             src="/assets/growth/tgm-logo.svg"
             alt="The Growth Manifesto — T.G.M. monogram"
-            className="h-auto w-[172px] md:absolute md:bottom-12 md:right-16"
+            className="h-auto w-[140px] md:absolute md:bottom-12 md:right-16 md:w-[172px]"
           />
+
+          <Link
+            to="/confessions"
+            className="order-last w-full text-center font-caslon text-[14px] whitespace-nowrap text-brand-gold underline-offset-4 transition-opacity hover:opacity-70 hover:underline md:order-none md:w-auto md:text-[15px]"
+          >
+            View all confessions →
+          </Link>
         </div>
 
         <ConfessionCard />

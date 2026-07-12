@@ -84,21 +84,21 @@ export function PostcardFace({
         )}
 
         <label
-          className="mt-2 font-fell text-[11px] italic md:text-[12px]"
+          className="mt-1 font-fell text-[10px] italic md:mt-2 md:text-[12px]"
           style={{ color: BORDER }}
         >
           Write your message here:
         </label>
 
         {editable ? (
-          <div className="relative mt-2 flex-1">
+          <div className="relative mt-1 flex-1 md:mt-2">
             <textarea
               autoFocus
               maxLength={MAX_CHARS}
               value={message}
               onChange={(e) => onMessage?.(e.target.value)}
               placeholder="Lost 500K in Marketing but didn't cross 100 users…"
-              className="h-full w-full resize-none border-none bg-transparent pr-10 font-fell text-[13px] leading-[1.7] italic outline-none placeholder:opacity-45 md:text-[14px]"
+              className="h-full w-full resize-none border-none bg-transparent pr-8 pb-4 font-fell text-[11px] leading-[1.6] italic outline-none placeholder:opacity-45 md:pr-10 md:text-[14px] md:leading-[1.7]"
               style={{ color: INK, caretColor: INK }}
             />
             <span
@@ -110,7 +110,7 @@ export function PostcardFace({
           </div>
         ) : (
           <p
-            className="mt-2 flex-1 overflow-hidden font-fell text-[13px] leading-[1.7] italic md:text-[14px]"
+            className="mt-1 flex-1 overflow-hidden font-fell text-[11px] leading-[1.6] italic md:mt-2 md:text-[14px] md:leading-[1.7]"
             style={{ color: INK }}
           >
             {message}
@@ -236,7 +236,7 @@ export function ConfessionCard() {
         viewport={{ once: true }}
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
         whileHover={{ rotate: -2, y: -8, transition: { duration: 0.35 } }}
-        className="pointer-events-auto absolute bottom-0 left-1/2 hidden w-[560px] max-w-[80vw] origin-bottom -translate-x-1/2 translate-y-[42%] cursor-pointer md:block"
+        className="pointer-events-auto absolute bottom-0 left-1/2 block w-[560px] max-w-[88vw] origin-bottom -translate-x-1/2 translate-y-[42%] cursor-pointer md:max-w-[80vw]"
       >
         <PostcardFace message="" />
       </motion.button>
@@ -245,7 +245,7 @@ export function ConfessionCard() {
       <AnimatePresence>
         {open && (
           <motion.div
-            className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+            className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-5 sm:p-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -256,7 +256,7 @@ export function ConfessionCard() {
               onClick={close}
             />
             <motion.div
-              className="relative z-10 w-full max-w-[560px]"
+              className="relative z-10 my-auto w-full max-w-[560px]"
               initial={{ opacity: 0, scale: 0.85, rotate: -4.7, y: 40 }}
               animate={{ opacity: 1, scale: 1, rotate: 0, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, rotate: -3, y: 30 }}
@@ -266,7 +266,7 @@ export function ConfessionCard() {
                 type="button"
                 onClick={close}
                 aria-label="Close"
-                className="absolute -top-3 -right-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-ink text-card-cream shadow-lg transition-transform hover:scale-110"
+                className="absolute -top-4 right-0 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-ink text-card-cream shadow-lg transition-transform hover:scale-110 sm:-top-3 sm:-right-3 sm:translate-y-0"
               >
                 <img
                   src="/assets/growth/confession-close.svg"
