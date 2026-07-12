@@ -7,4 +7,12 @@
   "observability": {
     "enabled": true,
   },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "the-growth-manifesto-db",
+      "database_id": "9216265f-69ef-49a8-af5a-815e87d3033b",
+      "migrations_dir": "migrations",
+    },
+  ],
 }

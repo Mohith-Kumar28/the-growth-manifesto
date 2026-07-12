@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { Link } from '@tanstack/react-router'
 import { ConfessionCard } from './confession-card'
+import { addLead } from '#/server/db'
 
 const SOCIALS = [
   { icon: '/assets/growth/icon-linkedin.svg', label: 'LinkedIn', href: '#' },
@@ -51,10 +53,12 @@ function Field({
   label,
   type = 'text',
   accent,
+  name,
 }: {
   label: string
   type?: string
   accent: string
+  name: string
 }) {
   return (
     <label className="block text-left">
@@ -62,6 +66,7 @@ function Field({
         {label}
       </span>
       <input
+        name={name}
         type={type}
         required
         className={`mt-1 w-full border-b border-card-cream/30 bg-transparent pb-2 font-fell text-[16px] text-card-cream outline-none transition-colors placeholder:text-card-cream/30 ${accent}`}
@@ -73,6 +78,10 @@ function Field({
 export function CtaFooter() {
   const [tab, setTab] = useState<TabKey>('founders')
   const [sent, setSent] = useState(false)
+  const mountedAt = useRef(0)
+  useEffect(() => {
+    mountedAt.current = Date.now()
+  }, [])
   const t = TABS[tab]
 
   return (
@@ -150,15 +159,41 @@ export function CtaFooter() {
                 exit={{ opacity: 0 }}
                 onSubmit={(e) => {
                   e.preventDefault()
+                  const fd = new FormData(e.currentTarget)
                   setSent(true)
+                  addLead({
+                    data: {
+                      name: String(fd.get('name') ?? ''),
+                      email: String(fd.get('email') ?? ''),
+                      message: String(fd.get('message') ?? ''),
+                      audience: tab,
+                      hp: String(fd.get('company') ?? ''),
+                      elapsed: Date.now() - mountedAt.current,
+                    },
+                  }).catch(() => {})
                 }}
               >
+                {/* honeypot */}
+                <input
+                  type="text"
+                  name="company"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden
+                  className="pointer-events-none absolute -left-[9999px] h-0 w-0 opacity-0"
+                />
                 <div className="grid gap-6 sm:grid-cols-2">
-                  <Field label="Name" accent={t.accentBorder} />
-                  <Field label="Email" type="email" accent={t.accentBorder} />
+                  <Field label="Name" name="name" accent={t.accentBorder} />
+                  <Field
+                    label="Email"
+                    name="email"
+                    type="email"
+                    accent={t.accentBorder}
+                  />
                 </div>
                 <div className="mt-6">
                   <Field
+                    name="message"
                     label={
                       tab === 'founders'
                         ? 'What are you building?'
@@ -183,7 +218,7 @@ export function CtaFooter() {
           </AnimatePresence>
         </div>
 
-        {/* bottom bar: socials + monogram */}
+        {/* bottom bar: socials + confessions link + monogram */}
         <div className="mt-16 flex items-end justify-between">
           <div className="flex items-center gap-5">
             {SOCIALS.map((s) => (
@@ -192,6 +227,13 @@ export function CtaFooter() {
               </a>
             ))}
           </div>
+
+          <Link
+            to="/confessions"
+            className="hidden font-caslon text-[15px] text-brand-gold underline-offset-4 transition-opacity hover:opacity-70 hover:underline sm:block"
+          >
+            View all confessions →
+          </Link>
 
           <div className="flex w-[150px] flex-col items-center gap-1">
             <img

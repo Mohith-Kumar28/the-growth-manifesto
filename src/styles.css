@@ -110,6 +110,103 @@ body::before {
   box-shadow: 0 10px 26px -12px rgba(40, 22, 8, 0.4);
 }
 
+/* Confession "burn away" — paper is eaten bottom-to-top behind a ragged,
+   flickering flame front (char → deep red → orange → glow). The jagged edge
+   comes from an SVG turbulence displacement filter (#tgm-fire) applied to both
+   the card and its flame overlay, so the burn line looks like real fire, not a
+   straight wipe. */
+@property --burn {
+  syntax: '<percentage>';
+  inherits: true;
+  initial-value: -18%;
+}
+@keyframes tgm-burn {
+  0% {
+    --burn: -18%;
+    opacity: 1;
+  }
+  8% {
+    filter: url(#tgm-fire) brightness(1.05);
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    --burn: 122%;
+    filter: url(#tgm-fire) brightness(0.5) saturate(1.6) contrast(1.15);
+    opacity: 0;
+  }
+}
+@keyframes tgm-flicker {
+  0% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+  100% {
+    opacity: 0.72;
+    transform: scaleY(1.06);
+  }
+}
+.tgm-burning {
+  position: relative;
+  filter: url(#tgm-fire);
+  animation: tgm-burn 1.9s cubic-bezier(0.55, 0, 0.75, 0.45) forwards;
+  -webkit-mask-image: linear-gradient(
+    to top,
+    transparent var(--burn),
+    #000 calc(var(--burn) + 11%)
+  );
+  mask-image: linear-gradient(
+    to top,
+    transparent var(--burn),
+    #000 calc(var(--burn) + 11%)
+  );
+}
+/* The flame band riding the burn line. */
+.tgm-burning::after {
+  content: '';
+  position: absolute;
+  inset: -3%;
+  z-index: 6;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  transform-origin: center bottom;
+  animation: tgm-flicker 0.11s steps(2, jump-none) infinite alternate;
+  background: linear-gradient(
+    to top,
+    transparent calc(var(--burn) - 12%),
+    rgba(30, 8, 0, 0.9) calc(var(--burn) - 6%),
+    rgba(140, 25, 0, 0.95) calc(var(--burn) - 2.5%),
+    #ff2d00 var(--burn),
+    #ff8a1e calc(var(--burn) + 2%),
+    #ffd76b calc(var(--burn) + 3.8%),
+    rgba(255, 190, 90, 0.4) calc(var(--burn) + 7%),
+    transparent calc(var(--burn) + 12%)
+  );
+}
+/* Soft rising heat-glow above the flame. */
+.tgm-burning::before {
+  content: '';
+  position: absolute;
+  inset: -6% -6% -2% -6%;
+  z-index: 5;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  filter: blur(9px);
+  background: linear-gradient(
+    to top,
+    transparent calc(var(--burn) - 2%),
+    rgba(255, 120, 20, 0.55) calc(var(--burn) + 3%),
+    rgba(255, 90, 10, 0.15) calc(var(--burn) + 11%),
+    transparent calc(var(--burn) + 20%)
+  );
+}
+@media (prefers-reduced-motion: reduce) {
+  .tgm-burning {
+    animation-duration: 0.5s;
+  }
+}
+
 /* Lenis smooth scrolling */
 html.lenis,
 html.lenis body {
