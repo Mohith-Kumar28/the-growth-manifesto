@@ -35,8 +35,13 @@ export function Hero() {
       <Reveal delay={0.1} className="mt-5 border-t border-ink/70 pt-2.5">
         <div className="aspect-[1076/410] w-full overflow-hidden bg-paper-rect">
           <motion.img
-            src="/assets/growth/hero.png"
+            src="/assets/growth/hero.webp"
             alt="A person reading in a chair on a hillside beneath a sky of flowing rainbow light"
+            width={1076}
+            height={410}
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
             className="h-full w-full object-cover object-[center_32%]"
             initial={{ scale: 1.08 }}
             whileInView={{ scale: 1 }}

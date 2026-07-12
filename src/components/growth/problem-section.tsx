@@ -77,8 +77,8 @@ function ProblemRow({
   )
 
   return (
-    <Reveal className="border border-rule" y={32}>
-      <div className="grid grid-cols-1 items-center gap-10 border border-rule p-6 md:grid-cols-2 md:gap-0 md:divide-x md:divide-dashed md:divide-rule">
+    <Reveal className="border border-rule/60" y={32}>
+      <div className="grid grid-cols-1 items-center gap-10 p-6 md:grid-cols-2 md:gap-0 md:divide-x md:divide-dashed md:divide-rule/60">
         <div className={diagramFirst ? 'md:order-2 md:pl-10' : 'md:pr-10'}>
           {text}
         </div>
@@ -86,7 +86,7 @@ function ProblemRow({
           {art}
         </div>
       </div>
-      <p className="py-2 text-center font-fell text-[18px] text-ink md:text-[20px]">
+      <p className="border-t border-rule/60 py-2.5 text-center font-fell text-[18px] text-ink md:text-[20px]">
         {caption}
       </p>
     </Reveal>

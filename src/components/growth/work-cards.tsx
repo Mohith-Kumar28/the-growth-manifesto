@@ -11,7 +11,7 @@ type WorkCard = {
 
 const CARDS: Array<WorkCard> = [
   {
-    image: '/assets/growth/card-red-full.png',
+    image: '/assets/growth/card-red-full.webp',
     stat: '20M+ organic Reddit views',
     heading: (
       <>
@@ -25,7 +25,7 @@ const CARDS: Array<WorkCard> = [
       'Reddit Growth · LinkedIn · Distribution · Product · Hunt · Community Acquisition · Enterprise Pipeline',
   },
   {
-    image: '/assets/growth/card-gold-full.png',
+    image: '/assets/growth/card-gold-full.webp',
     stat: '1B+ TikTok views',
     heading: (
       <>
@@ -39,7 +39,7 @@ const CARDS: Array<WorkCard> = [
       'TikTok Organic + Paid · UGC Creator Networks · Influencer Campaigns · Instagram Distribution',
   },
   {
-    image: '/assets/growth/card-dark-full.png',
+    image: '/assets/growth/card-dark-full.webp',
     stat: '4M+ users onboarded globally across AI + SaaS portfolios',
     heading: <>Sign-ups. Activation. Community.</>,
     headingClass: 'text-ink',
@@ -54,6 +54,8 @@ function WorkCardItem({ card }: { card: WorkCard }) {
       <img
         src={card.image}
         alt={card.stat}
+        loading="lazy"
+        decoding="async"
         className="aspect-[270/300] w-full object-contain"
       />
       <h3

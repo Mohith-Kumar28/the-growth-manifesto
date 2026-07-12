@@ -1,3 +1,5 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
 Disallow:
+
+Sitemap: https://the-growth-manifesto.mohithkumar808.workers.dev/sitemap.xml

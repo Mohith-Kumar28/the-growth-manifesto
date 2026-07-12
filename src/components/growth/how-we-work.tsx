@@ -17,7 +17,7 @@ const STEPS: Array<Step> = [
     title: 'Discovery Call',
     desc: 'We surface your pain points, real barrier, and North Star plus product, ICP, and budget.',
     weeks: 'Weeks 1',
-    image: '/assets/how-we-work/step1.png',
+    image: '/assets/how-we-work/step1.webp',
     dotClass: 'bg-brand-red',
     weeksClass: 'text-brand-red',
   },
@@ -26,7 +26,7 @@ const STEPS: Array<Step> = [
     title: 'Growth Map',
     desc: 'A 90-day, channel-by-channel funnel, ranked by where your ICP actually is, with budget attached.',
     weeks: 'Weeks 1-2',
-    image: '/assets/how-we-work/step2.png',
+    image: '/assets/how-we-work/step2.webp',
     dotClass: 'bg-brand-gold',
     weeksClass: 'text-brand-gold',
   },
@@ -35,7 +35,7 @@ const STEPS: Array<Step> = [
     title: 'Execution Plan',
     desc: 'Once aligned: a week-by-week plan with the actions to run and KPIs we track weekly.',
     weeks: 'Weeks 2-3',
-    image: '/assets/how-we-work/step3.png',
+    image: '/assets/how-we-work/step3.webp',
     dotClass: 'bg-brand-green',
     weeksClass: 'text-brand-green',
   },
@@ -44,7 +44,7 @@ const STEPS: Array<Step> = [
     title: 'Execute & Review',
     desc: 'We ship, then review the KPIs together every week adjusting as we go.',
     weeks: 'Ongoing',
-    image: '/assets/how-we-work/step4.png',
+    image: '/assets/how-we-work/step4.webp',
     dotClass: 'bg-ink',
     weeksClass: 'text-ink',
   },
@@ -142,6 +142,8 @@ export function HowWeWork() {
                   src={s.image}
                   alt={i === active ? `Step ${s.n}: ${s.title}` : ''}
                   aria-hidden={i !== active}
+                  loading="lazy"
+                  decoding="async"
                   initial={false}
                   animate={{ opacity: i === active ? 1 : 0 }}
                   transition={{ duration: 0.6, ease: 'easeInOut' }}
@@ -176,6 +178,8 @@ export function HowWeWork() {
             <img
               src={s.image}
               alt={`Step ${s.n}: ${s.title}`}
+              loading="lazy"
+              decoding="async"
               className="mt-4 w-full object-contain mix-blend-multiply"
             />
             <div className="mt-2 flex justify-end">

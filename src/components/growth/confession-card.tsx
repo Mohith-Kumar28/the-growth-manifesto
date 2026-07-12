@@ -2,8 +2,8 @@ import { useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { addConfession } from '#/server/db'
 
-const PAPER = '/assets/growth/confession-paper.png'
-const PHOTO = '/assets/growth/confession-photo.png'
+const PAPER = '/assets/growth/confession-paper.webp'
+const PHOTO = '/assets/growth/confession-photo.webp'
 const BORDER = '#b6ac91'
 const INK = '#504542'
 const MAX_CHARS = 280
@@ -57,6 +57,8 @@ export function PostcardFace({
           <img
             src={PHOTO}
             alt="Vintage landscape"
+            loading="lazy"
+            decoding="async"
             className="h-full w-full object-cover"
           />
         </div>
