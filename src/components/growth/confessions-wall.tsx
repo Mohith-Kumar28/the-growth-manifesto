@@ -1,8 +1,11 @@
+import { useState } from 'react'
 import { Link, getRouteApi } from '@tanstack/react-router'
 import { Masthead } from './masthead'
 import { PostcardFace } from './confession-card'
 import { SmoothScroll } from './smooth-scroll'
 import { Reveal } from './reveal'
+import { toggleConfessionLike } from '#/server/db'
+import type { Confession } from '#/server/db'
 
 const route = getRouteApi('/confessions')
 
@@ -20,6 +23,42 @@ const trimNatural = (text: string, id: number) => {
   const cut = text.slice(0, max)
   const lastSpace = cut.lastIndexOf(' ')
   return `${cut.slice(0, lastSpace > 40 ? lastSpace : max).trimEnd()}…`
+}
+
+function LikeablePostcard({ confession }: { confession: Confession }) {
+  const [likesCount, setLikesCount] = useState(confession.likes_count)
+  const [likedByMe, setLikedByMe] = useState(!!confession.liked_by_me)
+  const [pending, setPending] = useState(false)
+
+  const toggle = async () => {
+    if (pending) return
+    setPending(true)
+    const nextLiked = !likedByMe
+    setLikedByMe(nextLiked)
+    setLikesCount((c) => c + (nextLiked ? 1 : -1))
+    try {
+      const res = await toggleConfessionLike({ data: { id: confession.id } })
+      setLikedByMe(res.liked)
+    } catch {
+      // revert on failure
+      setLikedByMe(!nextLiked)
+      setLikesCount((c) => c + (nextLiked ? -1 : 1))
+    } finally {
+      setPending(false)
+    }
+  }
+
+  return (
+    <div style={{ transform: `rotate(${tiltOf(confession.id)}deg)` }}>
+      <PostcardFace
+        message={trimNatural(confession.message, confession.id)}
+        createdAt={confession.created_at}
+        likesCount={likesCount}
+        likedByMe={likedByMe}
+        onToggleLike={toggle}
+      />
+    </div>
+  )
 }
 
 export function ConfessionsWall() {
@@ -59,12 +98,7 @@ export function ConfessionsWall() {
             <div className="mt-14 grid grid-cols-1 gap-x-10 gap-y-14 md:grid-cols-2">
               {items.map((c, i) => (
                 <Reveal key={c.id} delay={(i % 2) * 0.08}>
-                  <div style={{ transform: `rotate(${tiltOf(c.id)}deg)` }}>
-                    <PostcardFace
-                    message={trimNatural(c.message, c.id)}
-                    createdAt={c.created_at}
-                  />
-                  </div>
+                  <LikeablePostcard confession={c} />
                 </Reveal>
               ))}
             </div>

@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Link } from '@tanstack/react-router'
 import { ConfessionCard } from './confession-card'
-import { addLead } from '#/server/db'
 
 const SOCIALS = [
   { icon: '/assets/growth/icon-linkedin.svg', label: 'LinkedIn', href: '#' },
@@ -19,10 +18,10 @@ const TABS: Record<
     heading: string
     subline: string
     button: string
+    to: '/founders' | '/vc'
     underline: string
     accentText: string
     accentBg: string
-    accentBorder: string
   }
 > = {
   founders: {
@@ -31,10 +30,10 @@ const TABS: Record<
     subline:
       'We work with a small number of companies at any one time. Selective, deliberate, and unapologetic about it.',
     button: 'Submit the case',
+    to: '/founders',
     underline: '/assets/growth/tab-underline.svg',
     accentText: 'text-brand-gold',
     accentBg: 'bg-brand-gold',
-    accentBorder: 'focus:border-brand-gold',
   },
   vc: {
     label: 'For VC Firms',
@@ -42,46 +41,15 @@ const TABS: Record<
     subline:
       'Portfolio partnerships available for firms with multiple companies that need the same distribution infrastructure.',
     button: 'Explore a Portfolio Partnership',
+    to: '/vc',
     underline: '/assets/growth/tab-underline-green.svg',
     accentText: 'text-brand-green',
     accentBg: 'bg-brand-green',
-    accentBorder: 'focus:border-brand-green',
   },
-}
-
-function Field({
-  label,
-  type = 'text',
-  accent,
-  name,
-}: {
-  label: string
-  type?: string
-  accent: string
-  name: string
-}) {
-  return (
-    <label className="block text-left">
-      <span className="font-caslon text-[12px] tracking-wide text-card-cream/60 uppercase">
-        {label}
-      </span>
-      <input
-        name={name}
-        type={type}
-        required
-        className={`mt-1 w-full border-b border-card-cream/30 bg-transparent pb-2 font-fell text-[16px] text-card-cream outline-none transition-colors placeholder:text-card-cream/30 ${accent}`}
-      />
-    </label>
-  )
 }
 
 export function CtaFooter() {
   const [tab, setTab] = useState<TabKey>('founders')
-  const [sent, setSent] = useState(false)
-  const mountedAt = useRef(0)
-  useEffect(() => {
-    mountedAt.current = Date.now()
-  }, [])
   const t = TABS[tab]
 
   return (
@@ -139,92 +107,26 @@ export function CtaFooter() {
           </AnimatePresence>
         </div>
 
-        {/* form */}
-        <div className="mx-auto mt-10 max-w-[620px]">
-          <AnimatePresence mode="wait">
-            {sent ? (
-              <motion.p
-                key="sent"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="border-t border-card-cream/30 pt-10 text-center font-fell text-[18px] italic text-card-cream"
-              >
-                Thank you — we&rsquo;ll be in touch shortly.
-              </motion.p>
-            ) : (
-              <motion.form
-                key="form"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onSubmit={(e) => {
-                  e.preventDefault()
-                  const fd = new FormData(e.currentTarget)
-                  setSent(true)
-                  addLead({
-                    data: {
-                      name: String(fd.get('name') ?? ''),
-                      email: String(fd.get('email') ?? ''),
-                      message: String(fd.get('message') ?? ''),
-                      audience: tab,
-                      hp: String(fd.get('company') ?? ''),
-                      elapsed: Date.now() - mountedAt.current,
-                    },
-                  }).catch(() => {})
-                }}
-              >
-                {/* honeypot */}
-                <input
-                  type="text"
-                  name="company"
-                  tabIndex={-1}
-                  autoComplete="off"
-                  aria-hidden
-                  className="pointer-events-none absolute -left-[9999px] h-0 w-0 opacity-0"
-                />
-                <div className="grid gap-6 sm:grid-cols-2">
-                  <Field label="Name" name="name" accent={t.accentBorder} />
-                  <Field
-                    label="Email"
-                    name="email"
-                    type="email"
-                    accent={t.accentBorder}
-                  />
-                </div>
-                <div className="mt-6">
-                  <Field
-                    name="message"
-                    label={
-                      tab === 'founders'
-                        ? 'What are you building?'
-                        : 'Tell us about your portfolio'
-                    }
-                    accent={t.accentBorder}
-                  />
-                </div>
-                <div className="mt-9 flex justify-center">
-                  <button
-                    type="submit"
-                    className={`inline-flex items-center gap-2 px-8 py-3.5 font-fell text-[12px] tracking-[2px] text-paper-rect uppercase transition-opacity hover:opacity-90 ${t.accentBg}`}
-                  >
-                    {t.button}
-                    <svg
-                      aria-hidden
-                      viewBox="0 0 24 24"
-                      className="h-3 w-3"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M5 12h14M13 6l6 6-6 6" />
-                    </svg>
-                  </button>
-                </div>
-              </motion.form>
-            )}
-          </AnimatePresence>
+        {/* CTA button — links out to the full intake page for this audience */}
+        <div className="mt-10 flex justify-center border-t border-card-cream/30 pt-10">
+          <Link
+            to={t.to}
+            className={`inline-flex items-center gap-2 px-8 py-3.5 font-fell text-[12px] tracking-[2px] text-paper-rect uppercase transition-opacity hover:opacity-90 ${t.accentBg}`}
+          >
+            {t.button}
+            <svg
+              aria-hidden
+              viewBox="0 0 24 24"
+              className="h-3 w-3"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </Link>
         </div>
 
         {/* bottom bar: confessions link stays centered above the postcard;

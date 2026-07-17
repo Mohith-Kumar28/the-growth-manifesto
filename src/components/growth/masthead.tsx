@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useLocation, useNavigate } from '@tanstack/react-router'
 import { scrollToId } from './smooth-scroll'
 
 const NAV_ITEMS = [
@@ -7,12 +8,18 @@ const NAV_ITEMS = [
   { label: 'Our Work', id: 'our-work' },
 ]
 
-export function Masthead() {
-  const [scrolled, setScrolled] = useState(false) // condensed size
+// Set by goToSection when the target section only exists on '/'; consumed
+// once the homepage has mounted and can actually scroll to it.
+const PENDING_SCROLL_KEY = 'tgm-pending-scroll'
+
+export function Masthead({ dark = false }: { dark?: boolean }) {
+  const [scrolled, setScrolled] = useState(false) // collapsed bar
   const [hasBg, setHasBg] = useState(false) // paper backing visible
   // Set on the client only — the server's clock/timezone may disagree with
   // the visitor's, which would cause a hydration mismatch.
   const [today, setToday] = useState('')
+  const navigate = useNavigate()
+  const { pathname } = useLocation()
 
   useEffect(() => {
     setToday(
@@ -36,104 +43,180 @@ export function Masthead() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  // Consume a pending cross-page scroll once we've landed on the homepage.
+  // The router flips `pathname` to '/' slightly before the new page's DOM
+  // (and its target section) actually mounts, so retry until the element
+  // shows up instead of firing once and giving up. Scrolls with plain
+  // `window.scrollTo` rather than `scrollToId`/Lenis — the freshly mounted
+  // Lenis instance from the new page hasn't measured the document yet at
+  // this point and silently no-ops.
+  useEffect(() => {
+    if (pathname !== '/') return
+    const pending = sessionStorage.getItem(PENDING_SCROLL_KEY)
+    if (!pending) return
+    let cancelled = false
+    let attempts = 0
+    const scrollNow = (id: string) => {
+      const el = document.getElementById(id)
+      if (!el) return
+      const rect = el.getBoundingClientRect()
+      window.scrollTo({ top: window.scrollY + rect.top - 90, behavior: 'smooth' })
+    }
+    const tryScroll = () => {
+      if (cancelled) return
+      if (document.getElementById(pending)) {
+        sessionStorage.removeItem(PENDING_SCROLL_KEY)
+        scrollNow(pending)
+        // Reassert once layout/scroll-restoration has settled, in case
+        // something reset the scroll position right after this fired. Not
+        // gated on `cancelled` — once we've claimed the pending scroll we
+        // see it through, even if this effect instance itself unmounts
+        // (e.g. React's dev-mode double-invoke of a fresh mount's effects).
+        setTimeout(() => scrollNow(pending), 300)
+        return
+      }
+      if (attempts++ < 40) setTimeout(tryScroll, 50)
+    }
+    tryScroll()
+    return () => {
+      cancelled = true
+    }
+  }, [pathname])
+
+  const goToSection = (id: string) => {
+    if (pathname === '/') {
+      scrollToId(id)
+    } else {
+      sessionStorage.setItem(PENDING_SCROLL_KEY, id)
+      navigate({ to: '/' })
+    }
+  }
+
+  const goHome = () => {
+    if (pathname === '/') scrollToId('top')
+    else navigate({ to: '/' })
+  }
+
   return (
     <header
       className={`sticky top-0 z-50 px-4 transition-all duration-500 md:px-6 ${
         hasBg ? 'pt-0' : 'pt-3 md:pt-4'
       }`}
     >
-      {/* Displacement filter that gives the paper its ragged, burnt edge. */}
-      <svg width="0" height="0" className="absolute" aria-hidden>
-        <filter id="tgm-burnt-edge" x="-6%" y="-20%" width="112%" height="140%">
-          <feTurbulence
-            type="fractalNoise"
-            baseFrequency="0.014 0.022"
-            numOctaves={2}
-            seed={7}
-            result="noise"
-          />
-          <feDisplacementMap
-            in="SourceGraphic"
-            in2="noise"
-            scale={9}
-            xChannelSelector="R"
-            yChannelSelector="G"
-          />
-        </filter>
-      </svg>
-
       <div
-        className={`relative mx-auto w-full max-w-[1140px] transition-shadow duration-500 ${
-          hasBg ? 'burnt-shadow' : ''
+        className={`relative mx-auto w-full max-w-[1140px] rounded-sm transition-shadow duration-500 ${
+          hasBg
+            ? dark
+              ? 'bg-ink shadow-[0_5px_8.5px_rgba(0,0,0,0.2)]'
+              : 'bg-paper-light shadow-[0_5px_8.5px_rgba(0,0,0,0.03)]'
+            : ''
         }`}
       >
-        {/* Paper backing appears on any scroll so content never bleeds through
-            the transparent/torn masthead; at the very top it's transparent. */}
-        <div
-          className={`transition-opacity duration-300 ease-out ${
-            hasBg ? 'opacity-100' : 'opacity-0'
-          }`}
-          aria-hidden
-        >
-          {/* solid backing — torn notches reveal paper, not the page content */}
-          <div className="burnt-base" />
-          {/* ragged/scorched top layer */}
-          <div className="burnt-bg" />
-        </div>
-
         <div
           className={`relative z-10 px-6 transition-all duration-500 md:px-10 ${
             scrolled ? 'py-2' : 'pt-6 pb-3 md:pt-7'
           }`}
         >
-          <p
-            className={`overflow-hidden text-center font-fell tracking-[0.23em] text-black uppercase transition-all duration-500 md:tracking-[3.68px] ${
-              scrolled
-                ? 'max-h-0 text-[0px] opacity-0'
-                : 'max-h-8 text-[13px] opacity-100 sm:text-[15px] md:text-[16px]'
-            }`}
-          >
-            Est. 2026&nbsp;&nbsp;·&nbsp;&nbsp;Growth Intelligence for Ambitious
-            Operators
-          </p>
-
-          <button
-            type="button"
-            onClick={() => scrollToId('top')}
-            className={`block w-full text-center font-chomsky leading-none text-black transition-all duration-500 ${
-              scrolled
-                ? 'text-[24px] sm:text-[30px] md:text-[34px]'
-                : 'mt-2 text-[22px] min-[400px]:text-[28px] sm:text-[46px] md:text-[62px] lg:text-[75px]'
-            }`}
-          >
-            The Growth Manifesto
-          </button>
-
+          {/* Full nameplate — collapses away once scrolled past the hero */}
           <div
-            className={`border-y border-ink/80 transition-all duration-500 ${
-              scrolled ? 'mt-2 py-0.5' : 'mt-4 py-1 md:mt-5'
+            className={`overflow-hidden transition-all duration-500 ${
+              scrolled ? 'max-h-0 opacity-0' : 'max-h-[220px] opacity-100'
             }`}
           >
-            <div className="grid grid-cols-2 items-center gap-y-1 font-caslon text-[11px] uppercase sm:grid-cols-3 md:text-[16px]">
-              <span className="text-left text-ink-soft">
-                Vol. I&nbsp;&nbsp;·&nbsp;&nbsp;Issue 1
-              </span>
-              <span className="text-right text-ink normal-case sm:text-center">
-                {today || ' '}
-              </span>
-              <nav className="hidden justify-end gap-3 text-right font-fell text-ink-soft capitalize sm:flex md:gap-4">
-                {NAV_ITEMS.map((item) => (
-                  <button
-                    key={item.label}
-                    type="button"
-                    onClick={() => scrollToId(item.id)}
-                    className="whitespace-nowrap transition-colors hover:text-brand-red"
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </nav>
+            <p
+              className={`overflow-hidden text-center font-fell text-[13px] tracking-[0.23em] uppercase sm:text-[15px] md:text-[16px] md:tracking-[3.68px] ${
+                dark ? 'text-card-cream' : 'text-black'
+              }`}
+            >
+              Est. 2026&nbsp;&nbsp;·&nbsp;&nbsp;Growth Intelligence for
+              Ambitious Operators
+            </p>
+
+            <button
+              type="button"
+              onClick={goHome}
+              className={`mt-2 block w-full text-center font-chomsky text-[22px] leading-none min-[400px]:text-[28px] sm:text-[46px] md:text-[62px] lg:text-[75px] ${
+                dark ? 'text-card-cream' : 'text-black'
+              }`}
+            >
+              The Growth Manifesto
+            </button>
+
+            <div
+              className={`mt-4 border-y py-1 md:mt-5 ${dark ? 'border-card-cream/40' : 'border-ink/80'}`}
+            >
+              <div className="grid grid-cols-2 items-center gap-y-1 font-caslon text-[11px] uppercase sm:grid-cols-3 md:text-[16px]">
+                <span
+                  className={`text-left ${dark ? 'text-gray-body' : 'text-ink-soft'}`}
+                >
+                  Vol. I&nbsp;&nbsp;·&nbsp;&nbsp;Issue 1
+                </span>
+                <span
+                  className={`text-right normal-case sm:text-center ${dark ? 'text-card-cream' : 'text-ink'}`}
+                >
+                  {today || ' '}
+                </span>
+                <nav
+                  className={`hidden justify-end gap-3 text-right font-fell capitalize sm:flex md:gap-4 ${
+                    dark ? 'text-gray-body' : 'text-ink-soft'
+                  }`}
+                >
+                  {NAV_ITEMS.map((item) => (
+                    <button
+                      key={item.label}
+                      type="button"
+                      onClick={() => goToSection(item.id)}
+                      className={`whitespace-nowrap transition-colors ${dark ? 'hover:text-brand-gold' : 'hover:text-brand-red'}`}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </nav>
+              </div>
             </div>
+          </div>
+
+          {/* Collapsed bar — matches the Figma condensed masthead */}
+          <div
+            className={`grid grid-cols-[1fr_auto_1fr] items-center overflow-hidden transition-all duration-500 ${
+              scrolled ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0'
+            }`}
+          >
+            <span
+              className={`justify-self-start font-caslon text-[12px] tracking-wide uppercase sm:text-[14px] md:text-[16px] ${
+                dark ? 'text-card-cream' : 'text-ink'
+              }`}
+            >
+              {today || ' '}
+            </span>
+
+            <button
+              type="button"
+              onClick={goHome}
+              aria-label="The Growth Manifesto — back to home"
+              className={`justify-self-center border-y-[3px] border-double px-3 py-0.5 font-chomsky text-[26px] leading-none sm:text-[30px] md:text-[36px] ${
+                dark ? 'border-card-cream/50 text-card-cream' : 'border-ink/70 text-black'
+              }`}
+            >
+              T.G.M.
+            </button>
+
+            <nav
+              className={`hidden justify-self-end gap-3 font-fell text-[14px] capitalize md:flex md:gap-4 md:text-[16px] ${
+                dark ? 'text-gray-body' : 'text-ink-soft'
+              }`}
+            >
+              {NAV_ITEMS.map((item) => (
+                <button
+                  key={item.label}
+                  type="button"
+                  onClick={() => goToSection(item.id)}
+                  className={`whitespace-nowrap transition-colors ${dark ? 'hover:text-brand-gold' : 'hover:text-brand-red'}`}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </nav>
           </div>
         </div>
       </div>

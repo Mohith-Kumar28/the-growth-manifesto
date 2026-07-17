@@ -63,7 +63,13 @@ function looksLikeBot(hp: string, elapsed: number): boolean {
   return hp.length > 0 || elapsed < MIN_ELAPSED_MS
 }
 
-export type Confession = { id: number; message: string; created_at: number }
+export type Confession = {
+  id: number
+  message: string
+  created_at: number
+  likes_count: number
+  liked_by_me: 0 | 1
+}
 
 export const listConfessions = createServerFn({ method: 'GET' })
   .validator((d: { page?: number } | undefined) => ({
@@ -71,11 +77,18 @@ export const listConfessions = createServerFn({ method: 'GET' })
   }))
   .handler(async ({ data }) => {
     const offset = (data.page - 1) * PER_PAGE
+    const fp = await fingerprint()
     const { results } = await db()
       .prepare(
-        'SELECT id, message, created_at FROM confessions ORDER BY id DESC LIMIT ? OFFSET ?',
+        `SELECT c.id, c.message, c.created_at, c.likes_count,
+                EXISTS(
+                  SELECT 1 FROM confession_likes cl
+                  WHERE cl.confession_id = c.id AND cl.fingerprint = ?
+                ) AS liked_by_me
+         FROM confessions c
+         ORDER BY c.id DESC LIMIT ? OFFSET ?`,
       )
-      .bind(PER_PAGE, offset)
+      .bind(fp, PER_PAGE, offset)
       .all<Confession>()
     const total = Number(
       (
@@ -91,6 +104,47 @@ export const listConfessions = createServerFn({ method: 'GET' })
       total,
       totalPages: Math.max(1, Math.ceil(total / PER_PAGE)),
     }
+  })
+
+export const toggleConfessionLike = createServerFn({ method: 'POST' })
+  .validator((d: { id?: number } | undefined) => ({
+    id: Number(d?.id) || 0,
+  }))
+  .handler(async ({ data }) => {
+    if (!data.id) throw new Error('Missing confession id')
+    const fp = await fingerprint()
+    const existing = await db()
+      .prepare(
+        'SELECT 1 FROM confession_likes WHERE confession_id = ? AND fingerprint = ?',
+      )
+      .bind(data.id, fp)
+      .first()
+    if (existing) {
+      await db()
+        .prepare(
+          'DELETE FROM confession_likes WHERE confession_id = ? AND fingerprint = ?',
+        )
+        .bind(data.id, fp)
+        .run()
+      await db()
+        .prepare(
+          'UPDATE confessions SET likes_count = MAX(0, likes_count - 1) WHERE id = ?',
+        )
+        .bind(data.id)
+        .run()
+      return { liked: false }
+    }
+    await db()
+      .prepare(
+        'INSERT INTO confession_likes (confession_id, fingerprint, created_at) VALUES (?, ?, ?)',
+      )
+      .bind(data.id, fp, now())
+      .run()
+    await db()
+      .prepare('UPDATE confessions SET likes_count = likes_count + 1 WHERE id = ?')
+      .bind(data.id)
+      .run()
+    return { liked: true }
   })
 
 export const addConfession = createServerFn({ method: 'POST' })
@@ -138,6 +192,7 @@ export const addLead = createServerFn({ method: 'POST' })
             email?: string
             message?: string
             audience?: string
+            details?: Record<string, string>
             hp?: string
             elapsed?: number
           }
@@ -147,6 +202,7 @@ export const addLead = createServerFn({ method: 'POST' })
       email: (d?.email ?? '').trim().slice(0, 200),
       message: (d?.message ?? '').trim().slice(0, 500),
       audience: d?.audience === 'vc' ? 'vc' : 'founders',
+      details: JSON.stringify(d?.details ?? {}).slice(0, 4000),
       hp: (d?.hp ?? '').trim(),
       elapsed: Number(d?.elapsed) || 0,
     }),
@@ -158,9 +214,9 @@ export const addLead = createServerFn({ method: 'POST' })
     await enforceRate('leads', fp)
     await db()
       .prepare(
-        'INSERT INTO leads (name, email, message, audience, fingerprint, created_at) VALUES (?, ?, ?, ?, ?, ?)',
+        'INSERT INTO leads (name, email, message, audience, details, fingerprint, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
       )
-      .bind(data.name, data.email, data.message, data.audience, fp, now())
+      .bind(data.name, data.email, data.message, data.audience, data.details, fp, now())
       .run()
     return { ok: true }
   })

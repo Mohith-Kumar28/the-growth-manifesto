@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=IM+Fell+DW+Pica:ital@0;1&family=IM+Fell+English:ital@0;1&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Poly:ital@0;1&family=Press+Start+2P&family=UnifrakturMaguntia&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IM+Fell+DW+Pica:ital@0;1&family=IM+Fell+English:ital@0;1&family=Poly:ital@0;1&family=Press+Start+2P&display=swap');
 @import 'tailwindcss';
 
 /*
@@ -6,18 +6,35 @@
   landing page. Palette and typography mirror the Figma source.
 
   Font mapping (Figma -> web):
-    Chomsky           -> UnifrakturMaguntia (blackletter nameplate)
+    Chomsky           -> Chomsky (self-hosted, exact)
     IM FELL DW Pica   -> IM Fell DW Pica (exact)
     IM FELL English   -> IM Fell English (exact)
-    Caslon Ionic Web  -> Libre Caslon Text (closest open substitute)
+    Caslon Ionic Web  -> Caslon Ionic Web (self-hosted, exact)
     Press Start 2P    -> Press Start 2P (exact)
     Poly              -> Poly (exact)
 */
+@font-face {
+  font-family: 'Chomsky';
+  src:
+    url('/fonts/chomsky.woff2') format('woff2'),
+    url('/fonts/chomsky.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Caslon Ionic Web';
+  src: url('/fonts/caslon-ionic.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
   --font-fell: 'IM Fell DW Pica', Georgia, serif;
   --font-fell-eng: 'IM Fell English', Georgia, serif;
-  --font-caslon: 'Libre Caslon Text', Georgia, serif;
-  --font-chomsky: 'UnifrakturMaguntia', 'Libre Caslon Text', serif;
+  --font-caslon: 'Caslon Ionic Web', Georgia, serif;
+  --font-chomsky: 'Chomsky', Georgia, serif;
   --font-pixel: 'Press Start 2P', monospace;
   --font-poly: 'Poly', Georgia, serif;
 
@@ -56,21 +73,6 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Newspaper grain — present and visible, sitting under all content. */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background-image: url('/assets/growth/paper-full.webp');
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center top;
-  mix-blend-mode: multiply;
-  opacity: 0.55;
-}
-
 /* Infinite logo marquee */
 @keyframes tgm-marquee {
   from {
@@ -87,43 +89,6 @@ body::before {
   .tgm-marquee-track {
     animation: none;
   }
-}
-
-/* Burnt / scorched aged-paper panel (masthead). The ragged edge comes from an
-   SVG displacement filter applied only to the background layer, so text stays
-   crisp. */
-/* Solid paper backing behind the torn layer — the ragged displacement notches
-   reveal this, not the page content scrolling underneath. */
-.burnt-base {
-  position: absolute;
-  inset: 0;
-  border-radius: 3px;
-  background-color: var(--color-paper-light);
-  background-image: url('/assets/growth/paper-full.webp');
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-blend-mode: multiply;
-}
-.burnt-bg {
-  position: absolute;
-  inset: 0;
-  border-radius: 3px;
-  background-color: var(--color-paper-light);
-  background-image: url('/assets/growth/paper-full.webp');
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-blend-mode: multiply;
-  border: 1.5px solid rgba(74, 45, 22, 0.45);
-  box-shadow:
-    inset 0 0 60px rgba(74, 42, 16, 0.16),
-    inset 0 0 14px rgba(52, 27, 8, 0.28),
-    inset 0 -22px 34px -20px rgba(52, 27, 8, 0.4);
-  filter: url(#tgm-burnt-edge);
-}
-.burnt-shadow {
-  box-shadow: 0 10px 26px -12px rgba(40, 22, 8, 0.4);
 }
 
 /* Confession "burn away" — paper is eaten bottom-to-top behind a ragged,

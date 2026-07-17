@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { Heart } from 'lucide-react'
 import { addConfession } from '#/server/db'
 
 const PAPER = '/assets/growth/confession-paper.webp'
@@ -24,11 +25,17 @@ export function PostcardFace({
   message,
   onMessage,
   createdAt,
+  likesCount,
+  likedByMe,
+  onToggleLike,
 }: {
   editable?: boolean
   message: string
   onMessage?: (v: string) => void
   createdAt?: number
+  likesCount?: number
+  likedByMe?: boolean
+  onToggleLike?: () => void
 }) {
   const dateStr =
     createdAt != null
@@ -115,6 +122,24 @@ export function PostcardFace({
           >
             {message}
           </p>
+        )}
+
+        {likesCount != null && (
+          <button
+            type="button"
+            onClick={onToggleLike}
+            aria-pressed={!!likedByMe}
+            aria-label={likedByMe ? 'Unlike this confession' : 'Like this confession'}
+            className="mt-1 flex items-center gap-1 self-start font-fell text-[11px] transition-transform hover:scale-105 md:text-[13px]"
+            style={{ color: likedByMe ? '#8b1a1a' : BORDER }}
+          >
+            <Heart
+              className="h-3.5 w-3.5 md:h-4 md:w-4"
+              fill={likedByMe ? '#8b1a1a' : 'none'}
+              strokeWidth={1.75}
+            />
+            {likesCount}
+          </button>
         )}
       </div>
     </div>

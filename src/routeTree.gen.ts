@@ -9,9 +9,21 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VcRouteImport } from './routes/vc'
+import { Route as FoundersRouteImport } from './routes/founders'
 import { Route as ConfessionsRouteImport } from './routes/confessions'
 import { Route as IndexRouteImport } from './routes/index'
 
+const VcRoute = VcRouteImport.update({
+  id: '/vc',
+  path: '/vc',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FoundersRoute = FoundersRouteImport.update({
+  id: '/founders',
+  path: '/founders',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ConfessionsRoute = ConfessionsRouteImport.update({
   id: '/confessions',
   path: '/confessions',
@@ -26,31 +38,53 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/confessions': typeof ConfessionsRoute
+  '/founders': typeof FoundersRoute
+  '/vc': typeof VcRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/confessions': typeof ConfessionsRoute
+  '/founders': typeof FoundersRoute
+  '/vc': typeof VcRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/confessions': typeof ConfessionsRoute
+  '/founders': typeof FoundersRoute
+  '/vc': typeof VcRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/confessions'
+  fullPaths: '/' | '/confessions' | '/founders' | '/vc'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/confessions'
-  id: '__root__' | '/' | '/confessions'
+  to: '/' | '/confessions' | '/founders' | '/vc'
+  id: '__root__' | '/' | '/confessions' | '/founders' | '/vc'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ConfessionsRoute: typeof ConfessionsRoute
+  FoundersRoute: typeof FoundersRoute
+  VcRoute: typeof VcRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/vc': {
+      id: '/vc'
+      path: '/vc'
+      fullPath: '/vc'
+      preLoaderRoute: typeof VcRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/founders': {
+      id: '/founders'
+      path: '/founders'
+      fullPath: '/founders'
+      preLoaderRoute: typeof FoundersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/confessions': {
       id: '/confessions'
       path: '/confessions'
@@ -71,6 +105,8 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConfessionsRoute: ConfessionsRoute,
+  FoundersRoute: FoundersRoute,
+  VcRoute: VcRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

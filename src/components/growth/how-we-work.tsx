@@ -17,7 +17,7 @@ const STEPS: Array<Step> = [
     title: 'Discovery Call',
     desc: 'We surface your pain points, real barrier, and North Star plus product, ICP, and budget.',
     weeks: 'Weeks 1',
-    image: '/assets/how-we-work/step1.webp',
+    image: '/assets/how-we-work/step1.png',
     dotClass: 'bg-brand-red',
     weeksClass: 'text-brand-red',
   },
@@ -26,7 +26,7 @@ const STEPS: Array<Step> = [
     title: 'Growth Map',
     desc: 'A 90-day, channel-by-channel funnel, ranked by where your ICP actually is, with budget attached.',
     weeks: 'Weeks 1-2',
-    image: '/assets/how-we-work/step2.webp',
+    image: '/assets/how-we-work/step2.png',
     dotClass: 'bg-brand-gold',
     weeksClass: 'text-brand-gold',
   },
@@ -35,7 +35,7 @@ const STEPS: Array<Step> = [
     title: 'Execution Plan',
     desc: 'Once aligned: a week-by-week plan with the actions to run and KPIs we track weekly.',
     weeks: 'Weeks 2-3',
-    image: '/assets/how-we-work/step3.webp',
+    image: '/assets/how-we-work/step3.png',
     dotClass: 'bg-brand-green',
     weeksClass: 'text-brand-green',
   },
@@ -44,7 +44,7 @@ const STEPS: Array<Step> = [
     title: 'Execute & Review',
     desc: 'We ship, then review the KPIs together every week adjusting as we go.',
     weeks: 'Ongoing',
-    image: '/assets/how-we-work/step4.webp',
+    image: '/assets/how-we-work/step4.png',
     dotClass: 'bg-ink',
     weeksClass: 'text-ink',
   },
@@ -136,7 +136,7 @@ export function HowWeWork() {
           <StepHeader step={STEPS[active]} />
 
           <div className="mt-2 grid grid-cols-1 items-center gap-2 md:grid-cols-[1.35fr_0.65fr] md:gap-8">
-            <div className="relative aspect-[3/2] md:-ml-[6%]">
+            <div className="relative aspect-[3/2] overflow-hidden md:-ml-[6%]">
               {STEPS.map((s, i) => (
                 <motion.img
                   key={s.n}
@@ -146,8 +146,8 @@ export function HowWeWork() {
                   loading="lazy"
                   decoding="async"
                   initial={false}
-                  animate={{ opacity: i === active ? 1 : 0 }}
-                  transition={{ duration: 0.6, ease: 'easeInOut' }}
+                  animate={{ y: i < active ? '-100%' : i > active ? '100%' : '0%' }}
+                  transition={{ duration: 0.6, ease: [0.65, 0, 0.35, 1] }}
                   className="absolute inset-0 h-full w-full object-contain mix-blend-multiply"
                 />
               ))}

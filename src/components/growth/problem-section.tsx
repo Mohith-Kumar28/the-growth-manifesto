@@ -1,10 +1,5 @@
 import { SectionBadge } from './section-badge'
-import {
-  ChannelsDiagram,
-  CompoundChart,
-  CycleDiagram,
-} from './problem-diagrams'
-import { Reveal, StopMotion } from './reveal'
+import { Reveal } from './reveal'
 
 type ProblemRowProps = {
   quote: string
@@ -62,23 +57,22 @@ function ProblemRow({
     />
   )
   const art = (
-    <div className="flex items-center justify-center">
-      <StopMotion
-        delay={0.1}
-        dx={diagramFirst ? -130 : 130}
-        dy={60}
-        rot={diagramFirst ? -14 : 14}
-        scale={0.78}
-        className="w-full max-w-[460px]"
-      >
-        {diagram}
-      </StopMotion>
-    </div>
+    <Reveal delay={0.1} className="flex items-center justify-center">
+      <div className="w-full max-w-[460px]">{diagram}</div>
+    </Reveal>
   )
 
   return (
     <Reveal className="border border-rule/60" y={32}>
-      <div className="grid grid-cols-1 items-center gap-10 p-6 md:grid-cols-2 md:gap-0 md:divide-x md:divide-dashed md:divide-rule/60">
+      <div className="relative grid grid-cols-1 items-center gap-10 p-6 md:grid-cols-2 md:gap-0">
+        <span
+          aria-hidden
+          className="pointer-events-none absolute top-6 bottom-6 left-1/2 hidden w-px -translate-x-1/2 md:block"
+          style={{
+            backgroundImage:
+              'repeating-linear-gradient(to bottom, var(--color-rule) 0 7px, transparent 7px 15px)',
+          }}
+        />
         <div className={diagramFirst ? 'md:order-2 md:pl-10' : 'md:pr-10'}>
           {text}
         </div>
@@ -127,7 +121,15 @@ export function ProblemSection() {
           labelTitle="Observation"
           labelSub="Most growth breaks when the channel does"
           caption="Engineered growth, Systems that Scale!"
-          diagram={<ChannelsDiagram />}
+          diagram={
+            <img
+              src="/assets/growth/diagram-channels.webp"
+              alt="Channel (temporary) feeds into System (Engineered), which feeds into Operator (Decisive)"
+              loading="lazy"
+              decoding="async"
+              className="w-full"
+            />
+          }
         />
 
         <ProblemRow
@@ -142,7 +144,15 @@ export function ProblemSection() {
           labelTitle="Principle"
           labelSub="Test everything. Scale only what proves itself."
           caption="System over hype. Compound over time."
-          diagram={<CycleDiagram />}
+          diagram={
+            <img
+              src="/assets/growth/diagram-cycle.webp"
+              alt="The Growth System cycle: Research (Find Truth), Distribute (Create Reach), Convert (Drive Action), Measure (Feedback)"
+              loading="lazy"
+              decoding="async"
+              className="w-full"
+            />
+          }
         />
 
         <ProblemRow
@@ -157,7 +167,15 @@ export function ProblemSection() {
           labelTitle="Result"
           labelSub="Real systems. Real growth. Real results."
           caption="Build Systems. Not Campaigns."
-          diagram={<CompoundChart />}
+          diagram={
+            <img
+              src="/assets/growth/diagram-compound.webp"
+              alt="Chart showing compound growth curve overtaking a flat campaign spike over time"
+              loading="lazy"
+              decoding="async"
+              className="w-full"
+            />
+          }
         />
       </div>
     </section>

@@ -20,6 +20,12 @@ const FACTS = [
     valueClass: 'text-brand-green',
     description: 'Revenue added',
   },
+  {
+    kicker: 'Fact 04',
+    value: '98%',
+    valueClass: 'text-brand-gold',
+    description: 'Users onboarded globally for AI + SaaS portfolios',
+  },
 ]
 
 export function Hero() {
@@ -36,7 +42,7 @@ export function Hero() {
         <div className="aspect-[1076/410] w-full overflow-hidden bg-paper-rect">
           <motion.img
             src="/assets/growth/hero.webp"
-            alt="A person reading in a chair on a hillside beneath a sky of flowing rainbow light"
+            alt="A person reading in a chair on a hillside beneath swirling clouds, rendered in halftone black and white"
             width={1076}
             height={410}
             loading="eager"
@@ -58,32 +64,28 @@ export function Hero() {
         </p>
       </Reveal>
 
-      {/* By the numbers — newspaper stat block with column rules */}
+      {/* By the numbers — newspaper stat block. The hairline above plus the
+          stat row's own top border read as a double rule; the row's bottom
+          border alone reads as a single rule, matching the Figma source. */}
       <div className="mt-12 md:mt-16">
-        <Reveal className="flex items-center gap-4">
-          <span className="h-px flex-1 bg-ink/20" />
-          <p className="font-caslon text-[12px] tracking-[0.3em] whitespace-nowrap text-gray uppercase md:text-[13px]">
-            By The Numbers
-          </p>
-          <span className="h-px flex-1 bg-ink/20" />
-        </Reveal>
+        <div className="h-px w-full bg-ink-soft/60" />
 
-        <dl className="mt-9 grid grid-cols-1 gap-12 sm:grid-cols-3 sm:gap-8">
+        <dl className="mt-1 grid grid-cols-1 gap-x-6 gap-y-10 border-y border-ink-soft/60 py-4 sm:grid-cols-2 lg:grid-cols-4">
           {FACTS.map((fact, i) => (
             <Reveal
               key={fact.kicker}
               delay={i * 0.1}
-              className="flex flex-col items-center px-4 text-center"
+              className="flex flex-col items-start gap-2 text-left"
             >
-              <dt className="font-caslon text-[12px] tracking-[0.22em] text-gray/70 uppercase">
-                {fact.kicker}
+              <dt className="font-caslon text-[18px] text-gray">
+                {fact.kicker}:
               </dt>
               <dd
-                className={`mt-1.5 font-caslon text-[56px] leading-none md:text-[68px] ${fact.valueClass}`}
+                className={`font-caslon text-[48px] leading-none md:text-[64px] ${fact.valueClass}`}
               >
                 {fact.value}
               </dd>
-              <p className="mt-2 max-w-[240px] font-fell text-[15px] leading-snug text-gray md:text-[16px]">
+              <p className="max-w-[240px] font-fell text-[15px] leading-snug text-gray md:text-[16px]">
                 {fact.description}
               </p>
             </Reveal>
