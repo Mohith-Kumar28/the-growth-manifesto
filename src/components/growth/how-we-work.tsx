@@ -127,11 +127,10 @@ export function HowWeWork() {
     >
       {/* Image pins & morphs step-by-step while the copy swaps; on mobile the
           same effect runs with the image and copy stacked vertically */}
-      <div
-        ref={containerRef}
-        className="relative"
-        style={{ height: `${STEPS.length * 100}vh` }}
-      >
+      {/* Height sets scroll distance per step: (height - 100vh) / STEPS.length.
+          Mobile gets a taller track (~90vh per step vs ~75vh) so a single
+          flick doesn't jump multiple steps. */}
+      <div ref={containerRef} className="relative h-[460vh] md:h-[400vh]">
         <div className="sticky top-0 flex h-svh flex-col justify-center py-10 md:h-screen md:py-16">
           <StepHeader step={STEPS[active]} />
 

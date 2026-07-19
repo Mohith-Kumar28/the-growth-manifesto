@@ -33,10 +33,14 @@ export function Masthead({ dark = false }: { dark?: boolean }) {
   }, [])
 
   useEffect(() => {
+    // Hysteresis: collapse and expand at different scroll positions. With a
+    // single threshold, collapsing the masthead shrinks the document (and
+    // near the page bottom the browser clamps scrollY back up across the
+    // threshold), which immediately re-expands it — an oscillating jiggle.
     const onScroll = () => {
       const y = window.scrollY
-      setHasBg(y > 48)
-      setScrolled(y > 130)
+      setHasBg((prev) => (prev ? y > 16 : y > 48))
+      setScrolled((prev) => (prev ? y > 40 : y > 130))
     }
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
@@ -194,7 +198,7 @@ export function Masthead({ dark = false }: { dark?: boolean }) {
               type="button"
               onClick={goHome}
               aria-label="The Growth Manifesto — back to home"
-              className={`justify-self-center border-y-[3px] border-double px-3 py-0.5 font-chomsky text-[26px] leading-none sm:text-[30px] md:text-[36px] ${
+              className={`col-span-2 justify-self-end border-y-[3px] border-double px-3 py-0.5 font-chomsky text-[26px] leading-none sm:text-[30px] md:col-span-1 md:justify-self-center md:text-[36px] ${
                 dark ? 'border-card-cream/50 text-card-cream' : 'border-ink/70 text-black'
               }`}
             >

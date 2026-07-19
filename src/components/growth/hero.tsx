@@ -57,12 +57,12 @@ export function Hero() {
         </div>
       </Reveal>
 
-      <Reveal delay={0.15}>
-        <p className="mt-2.5 font-fell text-[14px] text-gray md:text-[16px]">
-          When growth stops being an experiment and starts being a mandate:
-          companies call us.
-        </p>
-      </Reveal>
+      {/* No Reveal here — below the fold's whileInView margin on tall
+          viewports, so it stayed invisible until the first scroll. */}
+      <p className="mt-2.5 font-fell text-[14px] text-gray md:text-[16px]">
+        When growth stops being an experiment and starts being a mandate:
+        companies call us.
+      </p>
 
       {/* By the numbers — newspaper stat block. The hairline above plus the
           stat row's own top border read as a double rule; the row's bottom
