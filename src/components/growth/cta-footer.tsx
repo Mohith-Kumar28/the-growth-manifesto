@@ -54,7 +54,10 @@ export function CtaFooter() {
 
   return (
     <section className="mx-auto w-full max-w-[1140px] px-6 pt-24 pb-16 md:px-10 md:pt-32">
-      <div className="relative overflow-hidden rounded-sm bg-ink px-6 pt-14 pb-[46%] md:px-16 md:pt-20 md:pb-[26%]">
+      <div
+        id="start-your-chapter"
+        className="relative overflow-hidden rounded-sm bg-ink px-6 pt-14 pb-[40%] md:px-16 md:pt-20 md:pb-[19%]"
+      >
         {/* tabs */}
         <div className="flex items-center justify-center gap-6">
           {(Object.keys(TABS) as Array<TabKey>).map((key) => {
@@ -108,7 +111,7 @@ export function CtaFooter() {
         </div>
 
         {/* CTA button — links out to the full intake page for this audience */}
-        <div className="mt-10 flex justify-center border-t border-card-cream/30 pt-10">
+        <div className="mt-10 flex justify-center">
           <Link
             to={t.to}
             className={`inline-flex items-center gap-2 px-8 py-3.5 font-fell text-[12px] tracking-[2px] text-paper-rect uppercase transition-opacity hover:opacity-90 ${t.accentBg}`}
@@ -131,7 +134,7 @@ export function CtaFooter() {
 
         {/* bottom bar: confessions link stays centered above the postcard;
             socials + monogram drop to the bottom corners, flanking it (md+) */}
-        <div className="mt-20 flex flex-wrap items-center justify-between gap-y-12 md:mt-44 md:justify-center">
+        <div className="mt-12 flex flex-wrap items-center justify-between gap-y-12 md:mt-20 md:justify-center">
           <div className="flex flex-col items-start gap-4 md:absolute md:bottom-12 md:left-16 md:flex-row md:items-center md:gap-5">
             {SOCIALS.map((s) => (
               <a key={s.label} href={s.href} aria-label={s.label}>
@@ -145,13 +148,6 @@ export function CtaFooter() {
             alt="The Growth Manifesto — T.G.M. monogram"
             className="h-auto w-[140px] md:absolute md:bottom-12 md:right-16 md:w-[172px]"
           />
-
-          <Link
-            to="/confessions"
-            className="order-last w-full text-center font-caslon text-[14px] whitespace-nowrap text-brand-gold underline-offset-4 transition-opacity hover:opacity-70 hover:underline md:order-none md:w-auto md:text-[15px]"
-          >
-            View all confessions →
-          </Link>
         </div>
 
         <ConfessionCard />

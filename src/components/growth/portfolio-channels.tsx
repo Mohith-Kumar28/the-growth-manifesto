@@ -1,41 +1,72 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Reveal } from './reveal'
+import { NextStoryBanner } from './next-story-banner'
 
+/** Client stamps, in the order they run across the design's marquee. */
 const CLIENTS = [
   { name: 'Drizz', image: '/assets/growth/stamp-drizz.webp' },
   { name: 'Merlin', image: '/assets/growth/stamp-merlin.webp' },
   { name: 'rocket', image: '/assets/growth/stamp-rocket.webp' },
+  { name: 'cruva', image: '/assets/growth/stamp-cruva.webp' },
+  {
+    name: 'Reserved for your company',
+    image: '/assets/growth/stamp-reserved.webp',
+  },
   { name: 'Finlens', image: '/assets/growth/stamp-finlens.webp' },
+  { name: 'Ultrahuman', image: '/assets/growth/stamp-ultrahuman.webp' },
   { name: 'SABER', image: '/assets/growth/stamp-saber.webp' },
   { name: 'GM Markets', image: '/assets/growth/stamp-gmmarkets.webp' },
+  { name: 'august', image: '/assets/growth/stamp-august.webp' },
+  { name: 'Astrotalk', image: '/assets/growth/stamp-astrotalk.webp' },
+  { name: 'JK Index', image: '/assets/growth/stamp-jkindex.webp' },
+  { name: 'aurorax', image: '/assets/growth/stamp-aurorax.webp' },
 ]
 
-const CHANNELS = [
+type Channel = {
+  name: string
+  /** Portrait logo-only card shown while the deck is at rest. */
+  image: string
+  /** Landscape stats card exported from the design, revealed on hover/tap. */
+  expanded: string
+  /** The card's own fill, reused by the selected-thumbnail underline. */
+  accent: string
+}
+
+const CHANNELS: Array<Channel> = [
   {
     name: 'Reddit',
     image: '/assets/growth/channel-reddit.webp',
-    detail: '/assets/growth/channel-reddit-detail.webp',
+    expanded: '/assets/growth/channel-reddit-expanded.webp',
+    accent: 'bg-brand-red',
   },
   {
-    name: 'TikTok',
+    name: 'Influencer marketing',
     image: '/assets/growth/channel-tiktok.webp',
-    detail: '/assets/growth/channel-tiktok-detail.webp',
+    expanded: '/assets/growth/channel-influencer-expanded.webp',
+    accent: 'bg-brand-gold',
   },
   {
-    name: 'X',
+    name: 'X + LinkedIn',
     image: '/assets/growth/channel-x.webp',
-    detail: '/assets/growth/channel-x-detail.webp',
+    expanded: '/assets/growth/channel-x-linkedin-expanded.webp',
+    accent: 'bg-ink',
   },
   {
-    name: 'LinkedIn',
+    // TODO: mismatch inherited from the design. The expanded card here is
+    // TikTok Shop, but the collapsed row (Figma 267:108) still carries the old
+    // LinkedIn art for this slot — LinkedIn itself moved up into "X + LinkedIn".
+    // Needs a TikTok Shop portrait card drawn in Figma before this resolves.
+    name: 'TikTok Shop',
     image: '/assets/growth/channel-linkedin.webp',
-    detail: '/assets/growth/channel-linkedin-detail.webp',
+    expanded: '/assets/growth/channel-tiktok-shop-expanded.webp',
+    accent: 'bg-brand-green',
   },
   {
-    name: 'Product Hunt',
+    name: 'ProductHunt',
     image: '/assets/growth/channel-producthunt.webp',
-    detail: '/assets/growth/channel-producthunt-detail.webp',
+    expanded: '/assets/growth/channel-producthunt-expanded.webp',
+    accent: 'bg-brand-blue',
   },
 ]
 
@@ -54,21 +85,26 @@ export function PortfolioAndChannels() {
         </p>
       </Reveal>
 
-      <Reveal
-        delay={0.1}
-        className="mt-8 grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-6"
-      >
-        {CLIENTS.map((client) => (
-          <img
-            key={client.name}
-            src={client.image}
-            alt={client.name}
-            loading="lazy"
-            decoding="async"
-            className="aspect-[510/359] w-full object-contain"
-          />
-        ))}
+      <Reveal delay={0.1} className="mt-8">
+        {/* Infinite horizontal scroll; edges fade to page bg via mask */}
+        <div className="relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,#000_9%,#000_91%,transparent)]">
+          <div className="tgm-marquee-track flex w-max gap-2.5">
+            {[...CLIENTS, ...CLIENTS].map((client, i) => (
+              <img
+                key={`${client.name}-${i}`}
+                src={client.image}
+                alt={client.name}
+                aria-hidden={i >= CLIENTS.length}
+                loading="lazy"
+                decoding="async"
+                className="aspect-[522/374] w-[150px] shrink-0 object-contain md:w-[190px]"
+              />
+            ))}
+          </div>
+        </div>
       </Reveal>
+
+      <NextStoryBanner />
 
       <Reveal className="mt-16 md:mt-20">
         <h2 className="font-fell text-[26px] italic capitalize text-ink-soft md:text-[36px]">
@@ -79,62 +115,97 @@ export function PortfolioAndChannels() {
         </p>
       </Reveal>
 
-      {/* Desktop: simple card that crossfades into the detailed card on hover */}
-      <Reveal delay={0.1} className="mt-8 hidden gap-5 md:grid md:grid-cols-5">
-        {CHANNELS.map((channel) => (
-          <div key={channel.name} className="group relative">
-            <img
-              src={channel.image}
-              alt={channel.name}
-              loading="lazy"
-              decoding="async"
-              className="aspect-[200/270] w-full rounded-md object-cover transition-opacity duration-300 ease-out group-hover:opacity-0"
-            />
-            <img
-              src={channel.detail}
-              alt={`${channel.name} channel stats`}
-              loading="lazy"
-              decoding="async"
-              className="absolute inset-0 aspect-[200/270] w-full rounded-md object-cover opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100"
-            />
-          </div>
-        ))}
+      {/* Desktop: hover a card to expand it into a wide landscape card,
+          compressing its neighbours. Only from lg up — below that there isn't
+          enough width for the expanded card's stats to stay legible. */}
+      <Reveal delay={0.1} className="mt-8 hidden lg:block">
+        <DesktopChannelDeck />
       </Reveal>
 
-      {/* Mobile: selected detailed card on top, tappable thumbnail strip below */}
-      <Reveal delay={0.1} className="mt-8 md:hidden">
-        <MobileChannelDeck />
+      {/* Below lg: selected expanded card on top, tappable thumbnail strip below */}
+      <Reveal delay={0.1} className="mt-8 lg:hidden">
+        <CompactChannelDeck />
       </Reveal>
     </section>
   )
 }
 
-function MobileChannelDeck() {
+const EASE = [0.22, 1, 0.36, 1] as const
+
+function DesktopChannelDeck() {
+  const [hovered, setHovered] = useState<number | null>(null)
+
+  return (
+    <div className="flex h-[270px] gap-5" onMouseLeave={() => setHovered(null)}>
+      {CHANNELS.map((channel, i) => {
+        const isOpen = hovered === i
+
+        return (
+          <motion.div
+            key={channel.name}
+            className="relative min-w-0 basis-0 cursor-pointer overflow-hidden"
+            style={{ flexGrow: isOpen ? 3.5 : 1 }}
+            animate={{ flexGrow: isOpen ? 3.5 : 1 }}
+            transition={{ duration: 0.5, ease: EASE }}
+            onMouseEnter={() => setHovered(i)}
+          >
+            {/* Collapsed: logo-only card */}
+            <motion.img
+              src={channel.image}
+              alt={channel.name}
+              loading="lazy"
+              decoding="async"
+              className="absolute inset-0 h-full w-full object-cover"
+              animate={{ opacity: isOpen ? 0 : 1 }}
+              transition={{ duration: 0.3, ease: EASE }}
+            />
+
+            {/* Expanded: the design's landscape stats card. Anchored left so the
+                logo stays put as the card widens, and contained so the stats on
+                the right edge are never clipped. */}
+            <motion.img
+              src={channel.expanded}
+              alt={`${channel.name} channel results`}
+              loading="lazy"
+              decoding="async"
+              className="absolute inset-0 h-full w-full object-contain object-left"
+              animate={{ opacity: isOpen ? 1 : 0 }}
+              transition={{ duration: 0.3, ease: EASE }}
+              aria-hidden={!isOpen}
+            />
+          </motion.div>
+        )
+      })}
+    </div>
+  )
+}
+
+function CompactChannelDeck() {
   const [selected, setSelected] = useState(0)
 
   return (
-    <div className="mx-auto max-w-[315px]">
+    <div>
       <AnimatePresence mode="wait">
         <motion.img
           key={CHANNELS[selected].name}
-          src={CHANNELS[selected].detail}
-          alt={`${CHANNELS[selected].name} channel stats`}
+          src={CHANNELS[selected].expanded}
+          alt={`${CHANNELS[selected].name} channel results`}
           decoding="async"
           initial={{ opacity: 0, y: 14, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -14, scale: 0.98 }}
-          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-          className="mx-auto aspect-[200/270] w-[200px] rounded-md object-cover"
+          transition={{ duration: 0.35, ease: EASE }}
+          className="aspect-[1329/834] w-full object-contain"
         />
       </AnimatePresence>
 
-      <div className="mt-6 grid grid-cols-5 gap-2.5">
+      <div className="mx-auto mt-6 grid max-w-[420px] grid-cols-5 gap-2.5">
         {CHANNELS.map((channel, i) => (
           <button
             key={channel.name}
             type="button"
             onClick={() => setSelected(i)}
-            aria-label={`Show ${channel.name} stats`}
+            aria-label={`Show ${channel.name} results`}
             aria-pressed={i === selected}
             className="relative pb-2"
           >
@@ -148,7 +219,7 @@ function MobileChannelDeck() {
             {i === selected && (
               <motion.div
                 layoutId="channel-underline"
-                className="absolute -bottom-0.5 left-1/2 h-0.5 w-[49px] max-w-[90%] -translate-x-1/2 bg-brand-red"
+                className={`absolute -bottom-0.5 left-1/2 h-0.5 w-[49px] max-w-[90%] -translate-x-1/2 ${channel.accent}`}
               />
             )}
           </button>

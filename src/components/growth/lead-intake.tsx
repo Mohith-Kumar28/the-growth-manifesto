@@ -19,7 +19,7 @@ export function Field({
   return (
     <label className="block w-full text-left">
       <span
-        className={`font-fell text-[18px] italic md:text-[20px] ${dark ? 'text-card-cream' : 'text-ink'}`}
+        className={`font-caslon text-[13px] tracking-[0.16em] uppercase md:text-[14px] ${dark ? 'text-card-cream/80' : 'text-ink/80'}`}
       >
         {label}
       </span>
@@ -57,7 +57,7 @@ export function PillGroup({
   return (
     <div className="flex w-full flex-col items-start gap-3">
       <span
-        className={`font-fell text-[18px] italic md:text-[20px] ${dark ? 'text-card-cream' : 'text-ink'}`}
+        className={`font-caslon text-[13px] tracking-[0.16em] uppercase md:text-[14px] ${dark ? 'text-card-cream/80' : 'text-ink/80'}`}
       >
         {label}
       </span>
@@ -136,7 +136,7 @@ export function IntakePage({
     <>
       <SmoothScroll />
       <main
-        className={`min-h-screen w-full overflow-x-clip pb-24 ${dark ? 'bg-ink' : ''}`}
+        className={`min-h-screen w-full overflow-x-clip pb-40 md:pb-32 ${dark ? 'bg-ink' : ''}`}
       >
         <Masthead dark={dark} />
 

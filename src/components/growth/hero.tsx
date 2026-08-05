@@ -23,7 +23,7 @@ const FACTS = [
   {
     kicker: 'Fact 04',
     value: '98%',
-    valueClass: 'text-brand-gold',
+    valueClass: 'text-brand-blue',
     description: 'Users onboarded globally for AI + SaaS portfolios',
   },
 ]
@@ -42,7 +42,7 @@ export function Hero() {
         <div className="aspect-[1076/410] w-full overflow-hidden bg-paper-rect">
           <motion.img
             src="/assets/growth/hero.webp"
-            alt="A person reading in a chair on a hillside beneath swirling clouds, rendered in halftone black and white"
+            alt="A person reading in a chair on a grassy hillside beneath swirling iridescent clouds"
             width={1076}
             height={410}
             loading="eager"

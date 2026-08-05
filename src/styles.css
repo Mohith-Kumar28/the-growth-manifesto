@@ -82,8 +82,10 @@ body {
     transform: translateX(-50%);
   }
 }
+/* Duration is tuned to the track length (13 stamps, doubled) so the stamps
+   drift past at the same ~30px/s they did when the roster was shorter. */
 .tgm-marquee-track {
-  animation: tgm-marquee 38s linear infinite;
+  animation: tgm-marquee 82s linear infinite;
 }
 @media (prefers-reduced-motion: reduce) {
   .tgm-marquee-track {

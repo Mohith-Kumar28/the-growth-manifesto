@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { Link } from '@tanstack/react-router'
 import { Heart } from 'lucide-react'
 import { addConfession } from '#/server/db'
 
@@ -343,6 +344,13 @@ export function ConfessionCard() {
                         {error}
                       </p>
                     )}
+                    <Link
+                      to="/confessions"
+                      search={{ page: 1 }}
+                      className="mt-1 font-caslon text-[14px] whitespace-nowrap text-card-cream underline-offset-4 transition-opacity hover:opacity-70 hover:underline"
+                    >
+                      View all confessions →
+                    </Link>
                   </>
                 )}
               </div>
