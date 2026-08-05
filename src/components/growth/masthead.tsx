@@ -64,7 +64,10 @@ export function Masthead({ dark = false }: { dark?: boolean }) {
       const el = document.getElementById(id)
       if (!el) return
       const rect = el.getBoundingClientRect()
-      window.scrollTo({ top: window.scrollY + rect.top - 90, behavior: 'smooth' })
+      window.scrollTo({
+        top: window.scrollY + rect.top - 90,
+        behavior: 'smooth',
+      })
     }
     const tryScroll = () => {
       if (cancelled) return
@@ -103,12 +106,12 @@ export function Masthead({ dark = false }: { dark?: boolean }) {
 
   return (
     <header
-      className={`sticky top-0 z-50 px-4 transition-all duration-500 md:px-6 ${
+      className={`sticky top-0 z-50 px-4 md:px-6 ${
         hasBg ? 'pt-0' : 'pt-3 md:pt-4'
       }`}
     >
       <div
-        className={`relative mx-auto w-full max-w-[1140px] rounded-sm transition-shadow duration-500 ${
+        className={`relative mx-auto w-full max-w-[1140px] rounded-sm ${
           hasBg
             ? dark
               ? 'bg-ink shadow-[0_5px_8.5px_rgba(0,0,0,0.2)]'
@@ -117,13 +120,13 @@ export function Masthead({ dark = false }: { dark?: boolean }) {
         }`}
       >
         <div
-          className={`relative z-10 px-6 transition-all duration-500 md:px-10 ${
+          className={`relative z-10 px-6 md:px-10 ${
             scrolled ? 'py-2' : 'pt-6 pb-3 md:pt-7'
           }`}
         >
           {/* Full nameplate — collapses away once scrolled past the hero */}
           <div
-            className={`overflow-hidden transition-all duration-500 ${
+            className={`overflow-hidden ${
               scrolled ? 'max-h-0 opacity-0' : 'max-h-[220px] opacity-100'
             }`}
           >
@@ -182,7 +185,7 @@ export function Masthead({ dark = false }: { dark?: boolean }) {
 
           {/* Collapsed bar — matches the Figma condensed masthead */}
           <div
-            className={`grid grid-cols-[1fr_auto_1fr] items-center overflow-hidden transition-all duration-500 ${
+            className={`grid grid-cols-[1fr_auto_1fr] items-center overflow-hidden ${
               scrolled ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0'
             }`}
           >
@@ -199,7 +202,9 @@ export function Masthead({ dark = false }: { dark?: boolean }) {
               onClick={goHome}
               aria-label="The Growth Manifesto — back to home"
               className={`col-span-2 justify-self-end border-y-[3px] border-double px-3 py-0.5 font-chomsky text-[26px] leading-none sm:text-[30px] md:col-span-1 md:justify-self-center md:text-[36px] ${
-                dark ? 'border-card-cream/50 text-card-cream' : 'border-ink/70 text-black'
+                dark
+                  ? 'border-card-cream/50 text-card-cream'
+                  : 'border-ink/70 text-black'
               }`}
             >
               T.G.M.
