@@ -48,7 +48,7 @@ export function NextStoryBanner() {
           </div>
 
           <img
-            src="/assets/growth/typewriter-story.webp"
+            src="/assets/growth/type-writer.png"
             alt="An antique typewriter with a sheet reading &ldquo;What&rsquo;s your story?&rdquo;"
             width={198}
             height={198}

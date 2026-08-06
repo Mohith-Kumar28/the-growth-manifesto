@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { Reveal } from './reveal'
 import { NextStoryBanner } from './next-story-banner'
 
@@ -132,8 +132,23 @@ export function PortfolioAndChannels() {
 
 const EASE = [0.22, 1, 0.36, 1] as const
 
+/** Width morph. Springs so a mouse sweeping across the deck blends into the
+    next card instead of restarting. Collapse is quicker than expand so the
+    portrait logo isn't visible inside a still-wide box on the way back. */
+const EXPAND_SPRING = {
+  type: 'spring',
+  visualDuration: 0.6,
+  bounce: 0.15,
+} as const
+const COLLAPSE_SPRING = {
+  type: 'spring',
+  visualDuration: 0.45,
+  bounce: 0,
+} as const
+
 function DesktopChannelDeck() {
   const [hovered, setHovered] = useState<number | null>(null)
+  const reduce = useReducedMotion()
 
   return (
     <div className="flex h-[270px] gap-5" onMouseLeave={() => setHovered(null)}>
@@ -144,9 +159,16 @@ function DesktopChannelDeck() {
           <motion.div
             key={channel.name}
             className="relative min-w-0 basis-0 cursor-pointer overflow-hidden"
-            style={{ flexGrow: isOpen ? 3.5 : 1 }}
+            style={{ flexGrow: 1 }}
+            initial={false}
             animate={{ flexGrow: isOpen ? 3.5 : 1 }}
-            transition={{ duration: 0.5, ease: EASE }}
+            transition={
+              reduce
+                ? { duration: 0 }
+                : isOpen
+                  ? EXPAND_SPRING
+                  : COLLAPSE_SPRING
+            }
             onMouseEnter={() => setHovered(i)}
           >
             {/* Collapsed: logo-only card */}
@@ -157,7 +179,15 @@ function DesktopChannelDeck() {
               decoding="async"
               className="absolute inset-0 h-full w-full object-cover"
               animate={{ opacity: isOpen ? 0 : 1 }}
-              transition={{ duration: 0.3, ease: EASE }}
+              transition={
+                reduce
+                  ? { duration: 0 }
+                  : isOpen
+                    ? { duration: 0.22, ease: 'easeOut' }
+                    : // Held back until the card is narrow again — this art is
+                      // portrait, so it crops badly in a wide box.
+                      { duration: 0.32, delay: 0.18, ease: 'easeOut' }
+              }
             />
 
             {/* Expanded: the design's landscape stats card. Anchored left so the
@@ -170,7 +200,15 @@ function DesktopChannelDeck() {
               decoding="async"
               className="absolute inset-0 h-full w-full object-contain object-left"
               animate={{ opacity: isOpen ? 1 : 0 }}
-              transition={{ duration: 0.3, ease: EASE }}
+              transition={
+                reduce
+                  ? { duration: 0 }
+                  : isOpen
+                    ? // Delayed so the stats land as the width settles, rather
+                      // than reading as clipped inside a still-narrow card.
+                      { duration: 0.42, delay: 0.14, ease: 'easeOut' }
+                    : { duration: 0.2, ease: 'easeIn' }
+              }
               aria-hidden={!isOpen}
             />
           </motion.div>
