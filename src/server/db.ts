@@ -20,6 +20,10 @@ const MIN_GAP_SECONDS = 20 // at most one submission per 20s
 const HOURLY_CAP = 5 // at most 5 per hour
 const LIFETIME_CAP = 30 // at most 30 confessions per user, ever
 const MIN_ELAPSED_MS = 1200 // faster than this = almost certainly a bot
+// Quality floor for the wall. Heuristics, not moderation — just enough to
+// keep "abc" and keyboard mash off a page people are meant to read.
+const MIN_MESSAGE_CHARS = 25
+const MIN_MESSAGE_WORDS = 5
 
 /** Best-effort anonymous identity: hash of IP + UA + language. */
 async function fingerprint(): Promise<string> {
@@ -61,6 +65,32 @@ async function enforceRate(table: 'confessions' | 'leads', fp: string) {
 /** Cheap bot check: honeypot must be empty, form must not be filled instantly. */
 function looksLikeBot(hp: string, elapsed: number): boolean {
   return hp.length > 0 || elapsed < MIN_ELAPSED_MS
+}
+
+/** Returns a reader-facing reason the message can't go on the wall, or null. */
+function rejectReason(message: string): string | null {
+  if (message.length < MIN_MESSAGE_CHARS) {
+    return `A confession needs at least ${MIN_MESSAGE_CHARS} characters.`
+  }
+  const words = message.split(/\s+/).filter((w) => /\p{L}/u.test(w))
+  if (words.length < MIN_MESSAGE_WORDS) {
+    return `A confession needs at least ${MIN_MESSAGE_WORDS} words.`
+  }
+  const noise =
+    'That does not read like a sentence. Write it in your own words.'
+  // Mostly digits/punctuation, or one character hammered — keyboard mash.
+  const letters = message.match(/\p{L}/gu)?.length ?? 0
+  if (letters < message.length * 0.5) return noise
+  if (/(.)\1{4,}/u.test(message)) return noise
+  // "test test test test test" and friends.
+  const unique = new Set(words.map((w) => w.toLowerCase()))
+  if (unique.size * 2 < words.length) return noise
+  // Latin words with no vowel are mash ("qwrt zxcv"). Other scripts are exempt.
+  const latin = words.filter((w) => /^[a-z]{3,}$/i.test(w))
+  const voweless = latin.filter((w) => !/[aeiouy]/i.test(w)).length
+  if (latin.length >= MIN_MESSAGE_WORDS && voweless * 2 > latin.length)
+    return noise
+  return null
 }
 
 export type Confession = {
@@ -141,7 +171,9 @@ export const toggleConfessionLike = createServerFn({ method: 'POST' })
       .bind(data.id, fp, now())
       .run()
     await db()
-      .prepare('UPDATE confessions SET likes_count = likes_count + 1 WHERE id = ?')
+      .prepare(
+        'UPDATE confessions SET likes_count = likes_count + 1 WHERE id = ?',
+      )
       .bind(data.id)
       .run()
     return { liked: true }
@@ -159,20 +191,22 @@ export const addConfession = createServerFn({ method: 'POST' })
     if (!data.message) throw new Error('Message required')
     // Silently swallow obvious bots — no signal back to the attacker.
     if (looksLikeBot(data.hp, data.elapsed)) return { ok: true }
+    const rejected = rejectReason(data.message)
+    if (rejected) throw new Error(rejected)
     const fp = await fingerprint()
     await enforceRate('confessions', fp)
     const lifetime = Number(
       (
         await db()
-          .prepare('SELECT COUNT(*) AS c FROM confessions WHERE fingerprint = ?')
+          .prepare(
+            'SELECT COUNT(*) AS c FROM confessions WHERE fingerprint = ?',
+          )
           .bind(fp)
           .first<{ c: number }>()
       )?.c ?? 0,
     )
     if (lifetime >= LIFETIME_CAP) {
-      throw new Error(
-        `You have reached the ${LIFETIME_CAP}-confession limit.`,
-      )
+      throw new Error(`You have reached the ${LIFETIME_CAP}-confession limit.`)
     }
     await db()
       .prepare(
@@ -216,7 +250,15 @@ export const addLead = createServerFn({ method: 'POST' })
       .prepare(
         'INSERT INTO leads (name, email, message, audience, details, fingerprint, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
       )
-      .bind(data.name, data.email, data.message, data.audience, data.details, fp, now())
+      .bind(
+        data.name,
+        data.email,
+        data.message,
+        data.audience,
+        data.details,
+        fp,
+        now(),
+      )
       .run()
     return { ok: true }
   })

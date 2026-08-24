@@ -42,23 +42,19 @@ const CHANNELS: Array<Channel> = [
   },
   {
     name: 'Influencer marketing',
-    image: '/assets/growth/channel-tiktok.webp',
+    image: '/assets/growth/channel-influencer.webp',
     expanded: '/assets/growth/channel-influencer-expanded.webp',
     accent: 'bg-brand-gold',
   },
   {
     name: 'X + LinkedIn',
-    image: '/assets/growth/channel-x.webp',
+    image: '/assets/growth/channel-x-linkedin.webp',
     expanded: '/assets/growth/channel-x-linkedin-expanded.webp',
     accent: 'bg-ink',
   },
   {
-    // TODO: mismatch inherited from the design. The expanded card here is
-    // TikTok Shop, but the collapsed row (Figma 267:108) still carries the old
-    // LinkedIn art for this slot — LinkedIn itself moved up into "X + LinkedIn".
-    // Needs a TikTok Shop portrait card drawn in Figma before this resolves.
     name: 'TikTok Shop',
-    image: '/assets/growth/channel-linkedin.webp',
+    image: '/assets/growth/channel-tiktok-shop.webp',
     expanded: '/assets/growth/channel-tiktok-shop-expanded.webp',
     accent: 'bg-brand-green',
   },
