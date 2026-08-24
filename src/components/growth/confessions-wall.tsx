@@ -108,7 +108,7 @@ export function ConfessionsWall() {
           <div className="mt-16 flex items-center justify-center gap-8">
             <Link
               to="/confessions"
-              search={{ page: Math.max(1, page - 1) }}
+              search={{ page: page > 2 ? page - 1 : undefined }}
               disabled={page <= 1}
               className="font-caslon text-[15px] text-ink transition-opacity hover:text-brand-red aria-disabled:pointer-events-none aria-disabled:opacity-30"
               aria-disabled={page <= 1}

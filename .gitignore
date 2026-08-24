@@ -11,3 +11,6 @@ dist-ssr
 .vinxi
 __unconfig*
 todos.json
+
+# OG card font cache (scripts/generate-og-images.py)
+.cache

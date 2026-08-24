@@ -1,5 +1,12 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Allow: /
+
+# Social preview scrapers need the OG cards and the pages that reference them.
+User-agent: Twitterbot
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
 
 Sitemap: https://the-growth-manifesto.mohithkumar808.workers.dev/sitemap.xml

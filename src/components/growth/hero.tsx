@@ -32,10 +32,10 @@ export function Hero() {
   return (
     <section className="mx-auto w-full max-w-[1076px] px-6 pt-8 md:px-10">
       <Reveal>
-        <h2 className="text-center font-fell text-[26px] italic capitalize text-ink-soft sm:text-[34px] md:text-[40px]">
+        <h1 className="text-center font-fell text-[26px] italic capitalize text-ink-soft sm:text-[34px] md:text-[40px]">
           We <span className="text-brand-red">engineer growth</span>. For
           Startups That Refuse To Wait.
-        </h2>
+        </h1>
       </Reveal>
 
       <Reveal delay={0.1} className="mt-5 border-t border-ink/70 pt-2.5">
