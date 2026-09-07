@@ -12,6 +12,173 @@ const NAV_ITEMS = [
 // once the homepage has mounted and can actually scroll to it.
 const PENDING_SCROLL_KEY = 'tgm-pending-scroll'
 
+const EASE =
+  'duration-300 ease-out motion-reduce:transition-none motion-reduce:duration-0'
+
+type CardProps = {
+  dark: boolean
+  today: string
+  /** Condensed (T.G.M. bar) instead of the full nameplate. */
+  scrolled: boolean
+  /** Paper backing + shadow behind the card. */
+  hasBg: boolean
+  onHome?: () => void
+  onSection?: (id: string) => void
+}
+
+/**
+ * The masthead itself. Rendered twice: once invisibly in flow to reserve a
+ * constant height, once for real on top of that — see `Masthead` below.
+ */
+function MastheadCard({
+  dark,
+  today,
+  scrolled,
+  hasBg,
+  onHome,
+  onSection,
+}: CardProps) {
+  return (
+    <div
+      className={`px-4 transition-[padding] md:px-6 ${EASE} ${
+        hasBg ? 'pt-0' : 'pt-3 md:pt-4'
+      }`}
+    >
+      <div
+        className={`relative mx-auto w-full max-w-[1140px] rounded-sm transition-[background-color,box-shadow] ${EASE} ${
+          hasBg
+            ? dark
+              ? 'bg-ink shadow-[0_5px_8.5px_rgba(0,0,0,0.2)]'
+              : 'bg-paper-light shadow-[0_5px_8.5px_rgba(0,0,0,0.03)]'
+            : 'bg-transparent shadow-none'
+        }`}
+      >
+        <div
+          className={`relative z-10 px-6 transition-[padding] md:px-10 ${EASE} ${
+            scrolled ? 'py-2' : 'pt-6 pb-3 md:pt-7'
+          }`}
+        >
+          {/* Full nameplate — collapses away once scrolled past the hero.
+              The 1fr→0fr grid row animates to the content's real height, so
+              the shrink has no dead travel the way a max-height would. */}
+          <div
+            className={`grid transition-[grid-template-rows,opacity] ${EASE} ${
+              scrolled
+                ? 'grid-rows-[0fr] opacity-0'
+                : 'grid-rows-[1fr] opacity-100'
+            }`}
+          >
+            <div className="overflow-hidden">
+              <p
+                className={`text-center font-fell text-[13px] tracking-[0.23em] uppercase sm:text-[15px] md:text-[16px] md:tracking-[3.68px] ${
+                  dark ? 'text-card-cream' : 'text-black'
+                }`}
+              >
+                Est. 2026&nbsp;&nbsp;·&nbsp;&nbsp;Growth Intelligence for
+                Ambitious Operators
+              </p>
+
+              <button
+                type="button"
+                onClick={onHome}
+                className={`mt-2 block w-full text-center font-chomsky text-[22px] leading-none min-[400px]:text-[28px] sm:text-[46px] md:text-[62px] lg:text-[75px] ${
+                  dark ? 'text-card-cream' : 'text-black'
+                }`}
+              >
+                The Growth Manifesto
+              </button>
+
+              <div
+                className={`mt-4 border-y py-1 md:mt-5 ${dark ? 'border-card-cream/40' : 'border-ink/80'}`}
+              >
+                <div className="grid grid-cols-2 items-center gap-y-1 font-caslon text-[11px] uppercase sm:grid-cols-3 md:text-[16px]">
+                  <span
+                    className={`text-left ${dark ? 'text-gray-body' : 'text-ink-soft'}`}
+                  >
+                    Vol. I&nbsp;&nbsp;·&nbsp;&nbsp;Issue 1
+                  </span>
+                  <span
+                    className={`text-right normal-case sm:text-center ${dark ? 'text-card-cream' : 'text-ink'}`}
+                  >
+                    {today || ' '}
+                  </span>
+                  <nav
+                    className={`hidden justify-end gap-3 text-right font-fell capitalize sm:flex md:gap-4 ${
+                      dark ? 'text-gray-body' : 'text-ink-soft'
+                    }`}
+                  >
+                    {NAV_ITEMS.map((item) => (
+                      <button
+                        key={item.label}
+                        type="button"
+                        onClick={() => onSection?.(item.id)}
+                        className={`whitespace-nowrap transition-colors ${dark ? 'hover:text-brand-gold' : 'hover:text-brand-red'}`}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </nav>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Collapsed bar — matches the Figma condensed masthead */}
+          <div
+            className={`grid transition-[grid-template-rows,opacity] ${EASE} ${
+              scrolled
+                ? 'grid-rows-[1fr] opacity-100'
+                : 'grid-rows-[0fr] opacity-0'
+            }`}
+          >
+            <div className="overflow-hidden">
+              <div className="grid grid-cols-[1fr_auto_1fr] items-center">
+                <span
+                  className={`justify-self-start font-caslon text-[12px] tracking-wide uppercase sm:text-[14px] md:text-[16px] ${
+                    dark ? 'text-card-cream' : 'text-ink'
+                  }`}
+                >
+                  {today || ' '}
+                </span>
+
+                <button
+                  type="button"
+                  onClick={onHome}
+                  aria-label="The Growth Manifesto — back to home"
+                  className={`col-span-2 justify-self-end border-y-[3px] border-double px-3 py-0.5 font-chomsky text-[26px] leading-none sm:text-[30px] md:col-span-1 md:justify-self-center md:text-[36px] ${
+                    dark
+                      ? 'border-card-cream/50 text-card-cream'
+                      : 'border-ink/70 text-black'
+                  }`}
+                >
+                  T.G.M.
+                </button>
+
+                <nav
+                  className={`hidden justify-self-end gap-3 font-fell text-[14px] capitalize md:flex md:gap-4 md:text-[16px] ${
+                    dark ? 'text-gray-body' : 'text-ink-soft'
+                  }`}
+                >
+                  {NAV_ITEMS.map((item) => (
+                    <button
+                      key={item.label}
+                      type="button"
+                      onClick={() => onSection?.(item.id)}
+                      className={`whitespace-nowrap transition-colors ${dark ? 'hover:text-brand-gold' : 'hover:text-brand-red'}`}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </nav>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function Masthead({ dark = false }: { dark?: boolean }) {
   const [scrolled, setScrolled] = useState(false) // collapsed bar
   const [hasBg, setHasBg] = useState(false) // paper backing visible
@@ -33,14 +200,10 @@ export function Masthead({ dark = false }: { dark?: boolean }) {
   }, [])
 
   useEffect(() => {
-    // Hysteresis: collapse and expand at different scroll positions. With a
-    // single threshold, collapsing the masthead shrinks the document (and
-    // near the page bottom the browser clamps scrollY back up across the
-    // threshold), which immediately re-expands it — an oscillating jiggle.
     const onScroll = () => {
       const y = window.scrollY
-      setHasBg((prev) => (prev ? y > 16 : y > 48))
-      setScrolled((prev) => (prev ? y > 40 : y > 130))
+      setHasBg((prev) => (prev ? y > 8 : y > 32))
+      setScrolled((prev) => (prev ? y > 100 : y > 140))
     }
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
@@ -105,129 +268,37 @@ export function Masthead({ dark = false }: { dark?: boolean }) {
   }
 
   return (
-    <header
-      className={`sticky top-0 z-50 px-4 md:px-6 ${
-        hasBg ? 'pt-0' : 'pt-3 md:pt-4'
-      }`}
-    >
-      <div
-        className={`relative mx-auto w-full max-w-[1140px] rounded-sm ${
-          hasBg
-            ? dark
-              ? 'bg-ink shadow-[0_5px_8.5px_rgba(0,0,0,0.2)]'
-              : 'bg-paper-light shadow-[0_5px_8.5px_rgba(0,0,0,0.03)]'
-            : ''
-        }`}
-      >
-        <div
-          className={`relative z-10 px-6 md:px-10 ${
-            scrolled ? 'py-2' : 'pt-6 pb-3 md:pt-7'
-          }`}
-        >
-          {/* Full nameplate — collapses away once scrolled past the hero */}
-          <div
-            className={`overflow-hidden ${
-              scrolled ? 'max-h-0 opacity-0' : 'max-h-[220px] opacity-100'
-            }`}
-          >
-            <p
-              className={`overflow-hidden text-center font-fell text-[13px] tracking-[0.23em] uppercase sm:text-[15px] md:text-[16px] md:tracking-[3.68px] ${
-                dark ? 'text-card-cream' : 'text-black'
-              }`}
-            >
-              Est. 2026&nbsp;&nbsp;·&nbsp;&nbsp;Growth Intelligence for
-              Ambitious Operators
-            </p>
+    // `pointer-events-none` because the header keeps its full expanded height
+    // even while condensed; the live card re-enables them for itself so the
+    // leftover band doesn't swallow clicks on the page underneath.
+    <header className="pointer-events-none sticky top-0 z-50">
+      {/* Height keeper. The masthead's *flow* height must never change: it is
+          the first element in the document, so collapsing it shortens the
+          page, and the browser's scroll anchoring compensates by pulling
+          scrollY back by the same amount — the very value that decides
+          whether to collapse. That fed straight back into an
+          expand/collapse/expand loop on slow scrolls (no hysteresis band can
+          cover it: the jump is larger than the whole band). So the expanded
+          card is rendered once, invisibly, purely to reserve a constant
+          height, and the real one is overlaid on top of it. */}
+      <div className="invisible" aria-hidden inert>
+        <MastheadCard
+          dark={dark}
+          today={today}
+          scrolled={false}
+          hasBg={false}
+        />
+      </div>
 
-            <button
-              type="button"
-              onClick={goHome}
-              className={`mt-2 block w-full text-center font-chomsky text-[22px] leading-none min-[400px]:text-[28px] sm:text-[46px] md:text-[62px] lg:text-[75px] ${
-                dark ? 'text-card-cream' : 'text-black'
-              }`}
-            >
-              The Growth Manifesto
-            </button>
-
-            <div
-              className={`mt-4 border-y py-1 md:mt-5 ${dark ? 'border-card-cream/40' : 'border-ink/80'}`}
-            >
-              <div className="grid grid-cols-2 items-center gap-y-1 font-caslon text-[11px] uppercase sm:grid-cols-3 md:text-[16px]">
-                <span
-                  className={`text-left ${dark ? 'text-gray-body' : 'text-ink-soft'}`}
-                >
-                  Vol. I&nbsp;&nbsp;·&nbsp;&nbsp;Issue 1
-                </span>
-                <span
-                  className={`text-right normal-case sm:text-center ${dark ? 'text-card-cream' : 'text-ink'}`}
-                >
-                  {today || ' '}
-                </span>
-                <nav
-                  className={`hidden justify-end gap-3 text-right font-fell capitalize sm:flex md:gap-4 ${
-                    dark ? 'text-gray-body' : 'text-ink-soft'
-                  }`}
-                >
-                  {NAV_ITEMS.map((item) => (
-                    <button
-                      key={item.label}
-                      type="button"
-                      onClick={() => goToSection(item.id)}
-                      className={`whitespace-nowrap transition-colors ${dark ? 'hover:text-brand-gold' : 'hover:text-brand-red'}`}
-                    >
-                      {item.label}
-                    </button>
-                  ))}
-                </nav>
-              </div>
-            </div>
-          </div>
-
-          {/* Collapsed bar — matches the Figma condensed masthead */}
-          <div
-            className={`grid grid-cols-[1fr_auto_1fr] items-center overflow-hidden ${
-              scrolled ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0'
-            }`}
-          >
-            <span
-              className={`justify-self-start font-caslon text-[12px] tracking-wide uppercase sm:text-[14px] md:text-[16px] ${
-                dark ? 'text-card-cream' : 'text-ink'
-              }`}
-            >
-              {today || ' '}
-            </span>
-
-            <button
-              type="button"
-              onClick={goHome}
-              aria-label="The Growth Manifesto — back to home"
-              className={`col-span-2 justify-self-end border-y-[3px] border-double px-3 py-0.5 font-chomsky text-[26px] leading-none sm:text-[30px] md:col-span-1 md:justify-self-center md:text-[36px] ${
-                dark
-                  ? 'border-card-cream/50 text-card-cream'
-                  : 'border-ink/70 text-black'
-              }`}
-            >
-              T.G.M.
-            </button>
-
-            <nav
-              className={`hidden justify-self-end gap-3 font-fell text-[14px] capitalize md:flex md:gap-4 md:text-[16px] ${
-                dark ? 'text-gray-body' : 'text-ink-soft'
-              }`}
-            >
-              {NAV_ITEMS.map((item) => (
-                <button
-                  key={item.label}
-                  type="button"
-                  onClick={() => goToSection(item.id)}
-                  className={`whitespace-nowrap transition-colors ${dark ? 'hover:text-brand-gold' : 'hover:text-brand-red'}`}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </nav>
-          </div>
-        </div>
+      <div className="pointer-events-auto absolute inset-x-0 top-0">
+        <MastheadCard
+          dark={dark}
+          today={today}
+          scrolled={scrolled}
+          hasBg={hasBg}
+          onHome={goHome}
+          onSection={goToSection}
+        />
       </div>
     </header>
   )
