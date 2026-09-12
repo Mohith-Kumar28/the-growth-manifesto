@@ -82,10 +82,10 @@ body {
     transform: translateX(-50%);
   }
 }
-/* Duration is tuned to the track length (15 stamps, doubled) so the stamps
-   drift past at the same ~30px/s they did when the roster was shorter. */
+/* Duration is tuned to the track length (16 stamps, doubled): one lap is
+   16 x 200px, so 80s puts the stamps past at ~40px/s. */
 .tgm-marquee-track {
-  animation: tgm-marquee 95s linear infinite;
+  animation: tgm-marquee 80s linear infinite;
 }
 /* Hovering anywhere over the roster holds the drift so a stamp can be read,
    and it picks straight back up on leave. Pointer devices only: on touch a

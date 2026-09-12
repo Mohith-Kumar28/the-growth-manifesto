@@ -20,7 +20,8 @@
     "db:migrate": "wrangler d1 migrations apply the-growth-manifesto-db --remote",
     "cf:login": "wrangler login",
     "cf:preview": "pnpm run build && wrangler versions upload",
-    "cf:typegen": "wrangler types"
+    "cf:typegen": "wrangler types",
+    "sheets:backfill": "node --experimental-strip-types scripts/backfill-sheets.ts"
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.26.0",

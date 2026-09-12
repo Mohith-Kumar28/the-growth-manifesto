@@ -14,3 +14,6 @@ todos.json
 
 # OG card font cache (scripts/generate-og-images.py)
 .cache
+
+# Local Worker secrets (Google Sheets webhook)
+.dev.vars

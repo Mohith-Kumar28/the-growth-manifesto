@@ -5,10 +5,11 @@ import { NextStoryBanner } from './next-story-banner'
 import { scrollToId } from './smooth-scroll'
 
 /** Client stamps, in the order they run across the design's marquee.
-    Higgsfield appears twice, spaced about half a lap apart, so it comes back
-    around roughly twice as often as the rest of the roster. The second slot is
-    mid-roster rather than dead last: the track is rendered twice back to back,
-    so a first + last pairing would collide into a doubled stamp at the seam. */
+    Higgsfield and the reserved stamp each appear twice, so they come back
+    around roughly twice as often as the rest of the roster. With 16 slots
+    their pairs sit exactly half a lap apart (0/8 and 5/13) and stay clear of
+    each other. Neither pair is first + last: the track is rendered twice back
+    to back, so that would collide into a doubled stamp at the seam. */
 const CLIENTS = [
   { name: 'Higgsfield', image: '/assets/growth/stamp-higgsfield.webp' },
   { name: 'Drizz', image: '/assets/growth/stamp-drizz.webp' },
@@ -18,7 +19,7 @@ const CLIENTS = [
   {
     name: 'Reserved for your company',
     image: '/assets/growth/stamp-reserved.webp',
-    /** The one stamp that is a call to action — it jumps to the intake form. */
+    /** The stamps that are a call to action — they jump to the intake form. */
     cta: true,
   },
   { name: 'Finlens', image: '/assets/growth/stamp-finlens.webp' },
@@ -28,6 +29,11 @@ const CLIENTS = [
   { name: 'GM Markets', image: '/assets/growth/stamp-gmmarkets.webp' },
   { name: 'august', image: '/assets/growth/stamp-august.webp' },
   { name: 'Astrotalk', image: '/assets/growth/stamp-astrotalk.webp' },
+  {
+    name: 'Reserved for your company',
+    image: '/assets/growth/stamp-reserved.webp',
+    cta: true,
+  },
   { name: 'JK Index', image: '/assets/growth/stamp-jkindex.webp' },
   { name: 'aurorax', image: '/assets/growth/stamp-aurorax.webp' },
 ]
@@ -66,12 +72,6 @@ const CHANNELS: Array<Channel> = [
     image: '/assets/growth/channel-tiktok-shop.webp',
     expanded: '/assets/growth/channel-tiktok-shop-expanded.webp',
     accent: 'bg-brand-green',
-  },
-  {
-    name: 'ProductHunt',
-    image: '/assets/growth/channel-producthunt.webp',
-    expanded: '/assets/growth/channel-producthunt-expanded.webp',
-    accent: 'bg-brand-blue',
   },
 ]
 
@@ -274,7 +274,7 @@ function CompactChannelDeck() {
         />
       </AnimatePresence>
 
-      <div className="mx-auto mt-6 grid max-w-[420px] grid-cols-5 gap-2.5">
+      <div className="mx-auto mt-6 grid max-w-[340px] grid-cols-4 gap-2.5">
         {CHANNELS.map((channel, i) => (
           <button
             key={channel.name}

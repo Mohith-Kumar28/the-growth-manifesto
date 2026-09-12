@@ -1,6 +1,9 @@
 import { createServerFn } from '@tanstack/react-start'
 import { getRequestHeader } from '@tanstack/react-start/server'
 import { env } from 'cloudflare:workers'
+import { confessionRow, leadRow } from './sheet-rows'
+import { mirrorRow } from './sheets'
+import type { SheetsEnv } from './sheets'
 
 /* Minimal D1 shape — avoids depending on @cloudflare/workers-types. */
 type Stmt = {
@@ -12,6 +15,7 @@ type Stmt = {
 type D1 = { prepare: (query: string) => Stmt }
 
 const db = () => (env as unknown as { DB: D1 }).DB
+const sheetsEnv = (): SheetsEnv => env
 const now = () => Math.floor(Date.now() / 1000)
 
 const PER_PAGE = 6
@@ -208,12 +212,18 @@ export const addConfession = createServerFn({ method: 'POST' })
     if (lifetime >= LIFETIME_CAP) {
       throw new Error(`You have reached the ${LIFETIME_CAP}-confession limit.`)
     }
+    const createdAt = now()
     await db()
       .prepare(
         'INSERT INTO confessions (message, fingerprint, created_at) VALUES (?, ?, ?)',
       )
-      .bind(data.message, fp, now())
+      .bind(data.message, fp, createdAt)
       .run()
+    await mirrorRow(
+      sheetsEnv(),
+      'confessions',
+      confessionRow({ created_at: createdAt, message: data.message }),
+    )
     return { ok: true }
   })
 
@@ -246,6 +256,7 @@ export const addLead = createServerFn({ method: 'POST' })
     if (looksLikeBot(data.hp, data.elapsed)) return { ok: true }
     const fp = await fingerprint()
     await enforceRate('leads', fp)
+    const createdAt = now()
     await db()
       .prepare(
         'INSERT INTO leads (name, email, message, audience, details, fingerprint, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
@@ -257,8 +268,10 @@ export const addLead = createServerFn({ method: 'POST' })
         data.audience,
         data.details,
         fp,
-        now(),
+        createdAt,
       )
       .run()
+    const { tab, row } = leadRow({ ...data, created_at: createdAt })
+    await mirrorRow(sheetsEnv(), tab, row)
     return { ok: true }
   })

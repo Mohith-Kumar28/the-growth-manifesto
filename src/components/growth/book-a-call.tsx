@@ -1,5 +1,5 @@
 /** 15-minute intro call. Booked off-site, so it opens in its own tab. */
-const CAL_URL = 'https://cal.com/tgmlabs/15min'
+const CAL_URL = 'https://cal.com/tgmlabs/intro-call'
 
 /**
  * Always-available booking CTA, pinned to the top-right corner of the
