@@ -2,6 +2,7 @@ import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 
+import { BookACall } from '#/components/growth/book-a-call'
 import { SITE_NAME, SITE_URL, TAGLINE, absolute, ldScript } from '#/lib/seo'
 import appCss from '../styles.css?url'
 
@@ -127,6 +128,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         {children}
+        <BookACall />
         <TanStackDevtools
           config={{
             position: 'bottom-right',

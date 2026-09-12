@@ -1,5 +1,5 @@
+import { Link } from '@tanstack/react-router'
 import { Reveal } from './reveal'
-import { scrollToId } from './smooth-scroll'
 
 /**
  * Mid-page invitation that sits under the client marquee. The frame is drawn
@@ -33,17 +33,22 @@ export function NextStoryBanner() {
               </p>
             </div>
 
+            {/* Both halves of this CTA lead to the founders intake form —
+                the italic label reads as part of the invitation, so it is a
+                link in its own right rather than dead text beside the button. */}
             <div className="flex flex-wrap items-center gap-4 md:gap-5">
-              <span className="font-fell text-[20px] italic text-ink md:text-[24px]">
+              <Link
+                to="/founders"
+                className="font-fell text-[20px] italic text-ink underline-offset-4 transition-opacity hover:underline hover:opacity-80 md:text-[24px]"
+              >
                 Start Your Chapter
-              </span>
-              <button
-                type="button"
-                onClick={() => scrollToId('start-your-chapter')}
-                className="cursor-pointer bg-brand-red px-8 py-3.5 font-fell text-[12px] tracking-[2px] text-paper-rect uppercase transition-opacity hover:opacity-90"
+              </Link>
+              <Link
+                to="/founders"
+                className="bg-brand-red px-8 py-3.5 font-fell text-[12px] tracking-[2px] text-paper-rect uppercase transition-opacity hover:opacity-90"
               >
                 Tell us your story
-              </button>
+              </Link>
             </div>
           </div>
 

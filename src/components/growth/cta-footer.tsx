@@ -4,9 +4,21 @@ import { Link } from '@tanstack/react-router'
 import { ConfessionCard } from './confession-card'
 
 const SOCIALS = [
-  { icon: '/assets/growth/icon-linkedin.svg', label: 'LinkedIn', href: '#' },
-  { icon: '/assets/growth/icon-email.svg', label: 'Email', href: '#' },
-  { icon: '/assets/growth/icon-twitter.svg', label: 'Twitter', href: '#' },
+  {
+    icon: '/assets/growth/icon-linkedin.svg',
+    label: 'LinkedIn',
+    href: 'https://www.linkedin.com/in/hamid-akbar-43b112131/',
+  },
+  {
+    icon: '/assets/growth/icon-email.svg',
+    label: 'Email',
+    href: 'mailto:hamid@tgmlabs.co',
+  },
+  {
+    icon: '/assets/growth/icon-x.svg',
+    label: 'X',
+    href: 'https://x.com/hamidreddit',
+  },
 ]
 
 type TabKey = 'founders' | 'vc'
@@ -136,11 +148,22 @@ export function CtaFooter() {
             socials + monogram drop to the bottom corners, flanking it (md+) */}
         <div className="mt-12 flex flex-wrap items-center justify-between gap-y-12 md:mt-20 md:justify-center">
           <div className="flex flex-col items-start gap-4 md:absolute md:bottom-12 md:left-16 md:flex-row md:items-center md:gap-5">
-            {SOCIALS.map((s) => (
-              <a key={s.label} href={s.href} aria-label={s.label}>
-                <img src={s.icon} alt={s.label} className="h-8 w-8" />
-              </a>
-            ))}
+            {SOCIALS.map((s) => {
+              // mailto: stays in-page; the profile links leave the site.
+              const external = s.href.startsWith('http')
+              return (
+                <a
+                  key={s.label}
+                  href={s.href}
+                  aria-label={s.label}
+                  target={external ? '_blank' : undefined}
+                  rel={external ? 'noopener noreferrer' : undefined}
+                  className="transition-opacity hover:opacity-75"
+                >
+                  <img src={s.icon} alt="" aria-hidden className="h-8 w-8" />
+                </a>
+              )
+            })}
           </div>
 
           <img

@@ -2,9 +2,15 @@ import { useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { Reveal } from './reveal'
 import { NextStoryBanner } from './next-story-banner'
+import { scrollToId } from './smooth-scroll'
 
-/** Client stamps, in the order they run across the design's marquee. */
+/** Client stamps, in the order they run across the design's marquee.
+    Higgsfield appears twice, spaced about half a lap apart, so it comes back
+    around roughly twice as often as the rest of the roster. The second slot is
+    mid-roster rather than dead last: the track is rendered twice back to back,
+    so a first + last pairing would collide into a doubled stamp at the seam. */
 const CLIENTS = [
+  { name: 'Higgsfield', image: '/assets/growth/stamp-higgsfield.webp' },
   { name: 'Drizz', image: '/assets/growth/stamp-drizz.webp' },
   { name: 'Merlin', image: '/assets/growth/stamp-merlin.webp' },
   { name: 'rocket', image: '/assets/growth/stamp-rocket.webp' },
@@ -12,9 +18,12 @@ const CLIENTS = [
   {
     name: 'Reserved for your company',
     image: '/assets/growth/stamp-reserved.webp',
+    /** The one stamp that is a call to action — it jumps to the intake form. */
+    cta: true,
   },
   { name: 'Finlens', image: '/assets/growth/stamp-finlens.webp' },
   { name: 'Ultrahuman', image: '/assets/growth/stamp-ultrahuman.webp' },
+  { name: 'Higgsfield', image: '/assets/growth/stamp-higgsfield.webp' },
   { name: 'SABER', image: '/assets/growth/stamp-saber.webp' },
   { name: 'GM Markets', image: '/assets/growth/stamp-gmmarkets.webp' },
   { name: 'august', image: '/assets/growth/stamp-august.webp' },
@@ -82,20 +91,52 @@ export function PortfolioAndChannels() {
       </Reveal>
 
       <Reveal delay={0.1} className="mt-8">
-        {/* Infinite horizontal scroll; edges fade to page bg via mask */}
-        <div className="relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,#000_9%,#000_91%,transparent)]">
+        {/* Infinite horizontal scroll; edges fade to page bg via mask.
+            tgm-marquee lets a hover anywhere over the roster hold the drift. */}
+        <div className="tgm-marquee relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,#000_9%,#000_91%,transparent)]">
           <div className="tgm-marquee-track flex w-max gap-2.5">
-            {[...CLIENTS, ...CLIENTS].map((client, i) => (
-              <img
-                key={`${client.name}-${i}`}
-                src={client.image}
-                alt={client.name}
-                aria-hidden={i >= CLIENTS.length}
-                loading="lazy"
-                decoding="async"
-                className="aspect-[522/374] w-[150px] shrink-0 object-contain md:w-[190px]"
-              />
-            ))}
+            {[...CLIENTS, ...CLIENTS].map((client, i) => {
+              // The track is rendered twice to make the loop seamless; the
+              // second pass is decorative, so keep it out of the a11y tree and
+              // out of the tab order.
+              const duplicate = i >= CLIENTS.length
+
+              const stamp = (
+                <img
+                  src={client.image}
+                  alt={client.name}
+                  loading="lazy"
+                  decoding="async"
+                  className="aspect-[522/374] w-full object-contain"
+                />
+              )
+
+              if (!client.cta) {
+                return (
+                  <div
+                    key={`${client.name}-${i}`}
+                    aria-hidden={duplicate}
+                    className="w-[150px] shrink-0 md:w-[190px]"
+                  >
+                    {stamp}
+                  </div>
+                )
+              }
+
+              return (
+                <button
+                  key={`${client.name}-${i}`}
+                  type="button"
+                  onClick={() => scrollToId('start-your-chapter')}
+                  aria-hidden={duplicate}
+                  tabIndex={duplicate ? -1 : undefined}
+                  aria-label="Reserved for your company — start your chapter"
+                  className="w-[150px] shrink-0 cursor-pointer transition-transform duration-300 ease-out hover:-translate-y-1 focus-visible:-translate-y-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-red md:w-[190px]"
+                >
+                  {stamp}
+                </button>
+              )
+            })}
           </div>
         </div>
       </Reveal>

@@ -132,7 +132,12 @@ function MastheadCard({
             }`}
           >
             <div className="overflow-hidden">
-              <div className="grid grid-cols-[1fr_auto_1fr] items-center">
+              {/* Reserves the fixed "Book a call" button's corner so the
+                collapsed bar's right-aligned content (T.G.M. on small screens,
+                the nav from md up) never slides underneath it. Kept in step
+                with that button's fixed width + offset: 112+10 and 152+20,
+                each plus a 10px breathing gap. */}
+              <div className="grid grid-cols-[1fr_auto_1fr] items-center pr-[132px] md:pr-[182px]">
                 <span
                   className={`justify-self-start font-caslon text-[12px] tracking-wide uppercase sm:text-[14px] md:text-[16px] ${
                     dark ? 'text-card-cream' : 'text-ink'
@@ -154,8 +159,12 @@ function MastheadCard({
                   T.G.M.
                 </button>
 
+                {/* lg, not md: between them the collapsed bar has no room for
+                    the date, T.G.M., the nav and the Book a call button at
+                    once, and the grid would push the nav under that button.
+                    The full nav is still one scroll-up away. */}
                 <nav
-                  className={`hidden justify-self-end gap-3 font-fell text-[14px] capitalize md:flex md:gap-4 md:text-[16px] ${
+                  className={`hidden justify-self-end gap-3 font-fell text-[14px] capitalize md:gap-4 md:text-[16px] lg:flex ${
                     dark ? 'text-gray-body' : 'text-ink-soft'
                   }`}
                 >

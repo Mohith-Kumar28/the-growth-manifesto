@@ -82,10 +82,18 @@ body {
     transform: translateX(-50%);
   }
 }
-/* Duration is tuned to the track length (13 stamps, doubled) so the stamps
+/* Duration is tuned to the track length (15 stamps, doubled) so the stamps
    drift past at the same ~30px/s they did when the roster was shorter. */
 .tgm-marquee-track {
-  animation: tgm-marquee 82s linear infinite;
+  animation: tgm-marquee 95s linear infinite;
+}
+/* Hovering anywhere over the roster holds the drift so a stamp can be read,
+   and it picks straight back up on leave. Pointer devices only: on touch a
+   hover can stick with no matching leave, which would strand it paused. */
+@media (hover: hover) and (pointer: fine) {
+  .tgm-marquee:hover .tgm-marquee-track {
+    animation-play-state: paused;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .tgm-marquee-track {
