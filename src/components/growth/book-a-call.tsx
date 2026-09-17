@@ -11,13 +11,18 @@ const CAL_URL = 'https://cal.com/tgmlabs/intro-call'
  * bar reserves a matching gutter for it (see `masthead.tsx`); letting the label
  * size the button would let the two drift apart at some breakpoints.
  */
+/** Shared href so the masthead's inline mobile button stays in sync. */
+export const CAL_URL_EXPORT = CAL_URL
+
 export function BookACall() {
   return (
+    // Hidden on mobile — the masthead renders its own inline button there
+    // to avoid overlapping the nameplate / T.G.M. logo.
     <a
       href={CAL_URL}
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed top-2.5 right-2.5 z-[60] w-[112px] rounded-sm bg-brand-red py-2 text-center font-fell text-[10px] tracking-[1.5px] text-paper-rect uppercase shadow-[0_2px_10px_rgba(0,0,0,0.18)] transition-opacity hover:opacity-90 md:top-4 md:right-5 md:w-[152px] md:py-2.5 md:text-[12px] md:tracking-[2px]"
+      className="fixed top-4 right-5 z-[60] hidden w-[152px] rounded-sm bg-brand-red py-2.5 text-center font-fell text-[12px] tracking-[2px] text-paper-rect uppercase shadow-[0_2px_10px_rgba(0,0,0,0.18)] transition-opacity hover:opacity-90 md:block"
     >
       Book a call
     </a>

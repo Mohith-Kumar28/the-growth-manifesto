@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from '@tanstack/react-router'
 import { scrollToId } from './smooth-scroll'
+import { CAL_URL_EXPORT as CAL_URL } from './book-a-call'
 
 const NAV_ITEMS = [
   { label: 'The Problem', id: 'problem' },
@@ -120,6 +121,24 @@ function MastheadCard({
                   </nav>
                 </div>
               </div>
+
+              {/* Mobile-only Book a Call button — lives inside the nameplate
+                  so it never overlaps the logo or date text. Hidden on sm+ because
+                  the fixed floating button takes over there. */}
+              <div className="mt-3 flex justify-center sm:hidden">
+                <a
+                  href={CAL_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`inline-block rounded-sm px-6 py-2 font-fell text-[10px] tracking-[1.5px] uppercase transition-opacity hover:opacity-90 ${
+                    dark
+                      ? 'bg-brand-gold text-ink'
+                      : 'bg-brand-red text-paper-rect'
+                  }`}
+                >
+                  Book a Call
+                </a>
+              </div>
             </div>
           </div>
 
@@ -137,7 +156,10 @@ function MastheadCard({
                 the nav from md up) never slides underneath it. Kept in step
                 with that button's fixed width + offset: 112+10 and 152+20,
                 each plus a 10px breathing gap. */}
-              <div className="grid grid-cols-[1fr_auto_1fr] items-center pr-[132px] md:pr-[182px]">
+              {/* On mobile the fixed floating button is hidden, so we show
+                  the date + a small inline Book a Call button beside T.G.M.
+                  instead of reserving a gutter for the (invisible) fixed one. */}
+              <div className="grid grid-cols-[1fr_auto_1fr] items-center md:pr-[182px]">
                 <span
                   className={`justify-self-start font-caslon text-[12px] tracking-wide uppercase sm:text-[14px] md:text-[16px] ${
                     dark ? 'text-card-cream' : 'text-ink'
@@ -150,7 +172,7 @@ function MastheadCard({
                   type="button"
                   onClick={onHome}
                   aria-label="The Growth Manifesto — back to home"
-                  className={`col-span-2 justify-self-end border-y-[3px] border-double px-3 py-0.5 font-chomsky text-[26px] leading-none sm:text-[30px] md:col-span-1 md:justify-self-center md:text-[36px] ${
+                  className={`justify-self-center border-y-[3px] border-double px-3 py-0.5 font-chomsky text-[26px] leading-none sm:text-[30px] md:text-[36px] ${
                     dark
                       ? 'border-card-cream/50 text-card-cream'
                       : 'border-ink/70 text-black'
@@ -159,26 +181,41 @@ function MastheadCard({
                   T.G.M.
                 </button>
 
-                {/* lg, not md: between them the collapsed bar has no room for
-                    the date, T.G.M., the nav and the Book a call button at
-                    once, and the grid would push the nav under that button.
-                    The full nav is still one scroll-up away. */}
-                <nav
-                  className={`hidden justify-self-end gap-3 font-fell text-[14px] capitalize md:gap-4 md:text-[16px] lg:flex ${
-                    dark ? 'text-gray-body' : 'text-ink-soft'
-                  }`}
-                >
-                  {NAV_ITEMS.map((item) => (
-                    <button
-                      key={item.label}
-                      type="button"
-                      onClick={() => onSection?.(item.id)}
-                      className={`whitespace-nowrap transition-colors ${dark ? 'hover:text-brand-gold' : 'hover:text-brand-red'}`}
-                    >
-                      {item.label}
-                    </button>
-                  ))}
-                </nav>
+                {/* Right column: mobile shows a small inline Book a Call link;
+                    desktop (lg+) shows the nav links. */}
+                <div className="justify-self-end">
+                  {/* Mobile-only inline CTA in the collapsed bar */}
+                  <a
+                    href={CAL_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`inline-block rounded-sm px-3 py-1 font-fell text-[9px] tracking-[1.2px] uppercase transition-opacity hover:opacity-90 lg:hidden ${
+                      dark
+                        ? 'bg-brand-gold text-ink'
+                        : 'bg-brand-red text-paper-rect'
+                    }`}
+                  >
+                    Book a Call
+                  </a>
+
+                  {/* Desktop nav — lg+ only */}
+                  <nav
+                    className={`hidden gap-3 font-fell text-[14px] capitalize md:gap-4 md:text-[16px] lg:flex ${
+                      dark ? 'text-gray-body' : 'text-ink-soft'
+                    }`}
+                  >
+                    {NAV_ITEMS.map((item) => (
+                      <button
+                        key={item.label}
+                        type="button"
+                        onClick={() => onSection?.(item.id)}
+                        className={`whitespace-nowrap transition-colors ${dark ? 'hover:text-brand-gold' : 'hover:text-brand-red'}`}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </nav>
+                </div>
               </div>
             </div>
           </div>
