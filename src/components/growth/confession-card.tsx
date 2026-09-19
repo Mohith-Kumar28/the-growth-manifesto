@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Link } from '@tanstack/react-router'
 import { Heart } from 'lucide-react'
@@ -11,8 +11,18 @@ const INK = '#504542'
 const MAX_CHARS = 280
 
 const MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ]
 /** Deterministic UTC date string — avoids SSR/client locale mismatch. */
 const formatDate = (unixSeconds: number) => {
@@ -20,9 +30,32 @@ const formatDate = (unixSeconds: number) => {
   return `${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}`
 }
 
+/**
+ * Line-clamps a flex-filled paragraph to however many whole lines fit its
+ * box, so the ellipsis lands exactly at the bottom at every card size.
+ */
+function useFitLines(enabled: boolean) {
+  const ref = useRef<HTMLParagraphElement>(null)
+  const [lines, setLines] = useState<number>()
+  useLayoutEffect(() => {
+    const el = ref.current
+    if (!enabled || !el) return
+    const measure = () => {
+      const lh = parseFloat(getComputedStyle(el).lineHeight)
+      if (lh > 0) setLines(Math.max(1, Math.floor(el.clientHeight / lh)))
+    }
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [enabled])
+  return { ref, lines }
+}
+
 /** Postcard face — shared by the teaser, the modal, and the wall. */
 export function PostcardFace({
   editable = false,
+  clamp = false,
   message,
   onMessage,
   createdAt,
@@ -31,6 +64,8 @@ export function PostcardFace({
   onToggleLike,
 }: {
   editable?: boolean
+  /** Truncate the message with an ellipsis to fit; otherwise it scrolls. */
+  clamp?: boolean
   message: string
   onMessage?: (v: string) => void
   createdAt?: number
@@ -44,6 +79,7 @@ export function PostcardFace({
       : editable
         ? formatDate(Math.floor(Date.now() / 1000))
         : ''
+  const fit = useFitLines(clamp && !editable)
   return (
     <div
       className="relative aspect-[595/380] w-full overflow-hidden bg-[#e9e0c7] shadow-[0_18px_44px_rgba(0,0,0,0.35)]"
@@ -118,8 +154,20 @@ export function PostcardFace({
           </div>
         ) : (
           <p
-            className="mt-1 flex-1 overflow-hidden font-fell text-[11px] leading-[1.6] italic md:mt-2 md:text-[14px] md:leading-[1.7]"
-            style={{ color: INK }}
+            ref={fit.ref}
+            className={`mt-1 min-h-0 flex-1 font-fell text-[11px] leading-[1.6] break-words whitespace-pre-line italic md:mt-2 md:text-[14px] md:leading-[1.7] ${
+              clamp ? 'overflow-hidden' : 'overflow-y-auto pr-1'
+            }`}
+            style={{
+              color: INK,
+              ...(clamp && fit.lines
+                ? {
+                    display: '-webkit-box',
+                    WebkitBoxOrient: 'vertical',
+                    WebkitLineClamp: fit.lines,
+                  }
+                : null),
+            }}
           >
             {message}
           </p>
@@ -128,9 +176,14 @@ export function PostcardFace({
         {likesCount != null && (
           <button
             type="button"
-            onClick={onToggleLike}
+            onClick={(e) => {
+              e.stopPropagation()
+              onToggleLike?.()
+            }}
             aria-pressed={!!likedByMe}
-            aria-label={likedByMe ? 'Unlike this confession' : 'Like this confession'}
+            aria-label={
+              likedByMe ? 'Unlike this confession' : 'Like this confession'
+            }
             className="mt-1 flex items-center gap-1 self-start font-fell text-[11px] transition-transform hover:scale-105 md:text-[13px]"
             style={{ color: likedByMe ? '#8b1a1a' : BORDER }}
           >
@@ -174,7 +227,12 @@ export function ConfessionCard() {
   const emberBurst = async () => {
     const confetti = (await import('canvas-confetti')).default
     const fire = ['#ff3d00', '#ff7a18', '#ffcf5c', '#7a2e0e', '#ffd76b']
-    const base = { colors: fire, zIndex: 200, ticks: 140, disableForReducedMotion: false }
+    const base = {
+      colors: fire,
+      zIndex: 200,
+      ticks: 140,
+      disableForReducedMotion: false,
+    }
     confetti({
       ...base,
       particleCount: 70,

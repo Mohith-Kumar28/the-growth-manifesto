@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { AnimatePresence, motion } from 'framer-motion'
 import { Link, getRouteApi } from '@tanstack/react-router'
 import { Masthead } from './masthead'
 import { PostcardFace } from './confession-card'
@@ -16,19 +18,19 @@ const seeded = (id: number, salt: number) => {
 }
 // tilt: -4°..+4°
 const tiltOf = (id: number) => (seeded(id, 1) * 8 - 4).toFixed(2)
-// natural trim: 80..170 chars, cut on a word boundary
-const trimNatural = (text: string, id: number) => {
-  const max = 80 + Math.floor(seeded(id, 2) * 90)
-  if (text.length <= max) return text
-  const cut = text.slice(0, max)
-  const lastSpace = cut.lastIndexOf(' ')
-  return `${cut.slice(0, lastSpace > 40 ? lastSpace : max).trimEnd()}…`
-}
 
 function LikeablePostcard({ confession }: { confession: Confession }) {
   const [likesCount, setLikesCount] = useState(confession.likes_count)
   const [likedByMe, setLikedByMe] = useState(!!confession.liked_by_me)
   const [pending, setPending] = useState(false)
+  const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false)
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [open])
 
   const toggle = async () => {
     if (pending) return
@@ -48,16 +50,87 @@ function LikeablePostcard({ confession }: { confession: Confession }) {
     }
   }
 
+  const face = {
+    message: confession.message,
+    createdAt: confession.created_at,
+    likesCount,
+    likedByMe,
+    onToggleLike: toggle,
+  }
+
   return (
-    <div style={{ transform: `rotate(${tiltOf(confession.id)}deg)` }}>
-      <PostcardFace
-        message={trimNatural(confession.message, confession.id)}
-        createdAt={confession.created_at}
-        likesCount={likesCount}
-        likedByMe={likedByMe}
-        onToggleLike={toggle}
-      />
-    </div>
+    <>
+      <motion.div
+        role="button"
+        tabIndex={0}
+        aria-label="Read full confession"
+        onClick={() => setOpen(true)}
+        onKeyDown={(e) => {
+          if (e.target !== e.currentTarget) return
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            setOpen(true)
+          }
+        }}
+        style={{ rotate: Number(tiltOf(confession.id)) }}
+        whileHover={{ y: -6, transition: { duration: 0.3 } }}
+        className="cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand-gold"
+      >
+        <PostcardFace clamp {...face} />
+      </motion.div>
+
+      {/* Portalled: Reveal's transform would otherwise trap `fixed`. */}
+      {typeof document !== 'undefined' &&
+        createPortal(
+          <AnimatePresence>
+            {open && (
+              <motion.div
+                className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-5 sm:p-6"
+                data-lenis-prevent
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div
+                  className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+                  onClick={() => setOpen(false)}
+                />
+                <motion.div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="Confession"
+                  className="relative z-10 my-auto w-full max-w-[720px]"
+                  initial={{
+                    opacity: 0,
+                    scale: 0.85,
+                    rotate: Number(tiltOf(confession.id)),
+                    y: 40,
+                  }}
+                  animate={{ opacity: 1, scale: 1, rotate: 0, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9, y: 30 }}
+                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setOpen(false)}
+                    aria-label="Close"
+                    className="absolute -top-4 right-0 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-ink text-card-cream shadow-lg transition-transform hover:scale-110 sm:-top-3 sm:-right-3 sm:translate-y-0"
+                  >
+                    <img
+                      src="/assets/growth/confession-close.svg"
+                      alt=""
+                      className="h-4 w-4"
+                    />
+                  </button>
+                  <PostcardFace {...face} />
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>,
+          document.body,
+        )}
+    </>
   )
 }
 
