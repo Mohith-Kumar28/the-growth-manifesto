@@ -2,9 +2,6 @@ import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from '@tanstack/react-router'
 import { scrollToId } from './smooth-scroll'
 
-/** 15-minute intro call. Booked off-site, so it opens in its own tab. */
-const CAL_URL = 'https://cal.com/tgmlabs/intro-call'
-
 const NAV_ITEMS = [
   { label: 'The Problem', id: 'problem' },
   { label: 'Who We Work With', id: 'work-with' },
@@ -21,6 +18,8 @@ const EASE =
 type CardProps = {
   dark: boolean
   today: string
+  /** e.g. "Sep 27, 2026" — the collapsed bar's date on phones. */
+  todayShort: string
   /** Condensed (T.G.M. bar) instead of the full nameplate. */
   scrolled: boolean
   /** Paper backing + shadow behind the card. */
@@ -36,6 +35,7 @@ type CardProps = {
 function MastheadCard({
   dark,
   today,
+  todayShort,
   scrolled,
   hasBg,
   onHome,
@@ -123,23 +123,6 @@ function MastheadCard({
                   </nav>
                 </div>
               </div>
-
-              {/* Mobile-only Book a Call button — lives inside the nameplate
-                  so it never overlaps the logo or date text. */}
-              <div className="mt-3 flex justify-center sm:hidden">
-                <a
-                  href={CAL_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`inline-block rounded-sm px-6 py-2 font-fell text-[10px] tracking-[1.5px] uppercase transition-opacity hover:opacity-90 ${
-                    dark
-                      ? 'bg-brand-gold text-ink'
-                      : 'bg-brand-red text-paper-rect'
-                  }`}
-                >
-                  Book a Call
-                </a>
-              </div>
             </div>
           </div>
 
@@ -152,15 +135,16 @@ function MastheadCard({
             }`}
           >
             <div className="overflow-hidden">
-              {/* On mobile we show the date + a small inline Book a Call
-                  button beside T.G.M. */}
               <div className="grid grid-cols-[1fr_auto_1fr] items-center">
                 <span
-                  className={`justify-self-start font-caslon text-[12px] tracking-wide uppercase sm:text-[14px] md:text-[16px] ${
+                  className={`justify-self-start font-caslon text-[12px] tracking-wide whitespace-nowrap uppercase sm:text-[14px] md:text-[16px] ${
                     dark ? 'text-card-cream' : 'text-ink'
                   }`}
                 >
-                  {today || ' '}
+                  {/* The full date wraps to three lines beside T.G.M. on a
+                      phone. */}
+                  <span className="sm:hidden">{todayShort || ' '}</span>
+                  <span className="hidden sm:inline">{today || ' '}</span>
                 </span>
 
                 <button
@@ -176,23 +160,8 @@ function MastheadCard({
                   T.G.M.
                 </button>
 
-                {/* Right column: mobile shows a small inline Book a Call link;
-                    desktop (lg+) shows the nav links. */}
+                {/* Right column: the nav links, lg+ only. */}
                 <div className="justify-self-end">
-                  {/* Mobile-only inline CTA in the collapsed bar */}
-                  <a
-                    href={CAL_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`inline-block rounded-sm px-3 py-1 font-fell text-[9px] tracking-[1.2px] uppercase transition-opacity hover:opacity-90 lg:hidden ${
-                      dark
-                        ? 'bg-brand-gold text-ink'
-                        : 'bg-brand-red text-paper-rect'
-                    }`}
-                  >
-                    Book a Call
-                  </a>
-
                   {/* Desktop nav — lg+ only */}
                   <nav
                     className={`hidden gap-3 font-fell text-[14px] capitalize md:gap-4 md:text-[16px] lg:flex ${
@@ -226,6 +195,7 @@ export function Masthead({ dark = false }: { dark?: boolean }) {
   // Set on the client only — the server's clock/timezone may disagree with
   // the visitor's, which would cause a hydration mismatch.
   const [today, setToday] = useState('')
+  const [todayShort, setTodayShort] = useState('')
   const navigate = useNavigate()
   const { pathname } = useLocation()
 
@@ -234,6 +204,13 @@ export function Masthead({ dark = false }: { dark?: boolean }) {
       new Date().toLocaleDateString('en-US', {
         weekday: 'long',
         month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+      }),
+    )
+    setTodayShort(
+      new Date().toLocaleDateString('en-US', {
+        month: 'short',
         day: 'numeric',
         year: 'numeric',
       }),
@@ -326,6 +303,7 @@ export function Masthead({ dark = false }: { dark?: boolean }) {
         <MastheadCard
           dark={dark}
           today={today}
+          todayShort={todayShort}
           scrolled={false}
           hasBg={false}
         />
@@ -335,6 +313,7 @@ export function Masthead({ dark = false }: { dark?: boolean }) {
         <MastheadCard
           dark={dark}
           today={today}
+          todayShort={todayShort}
           scrolled={scrolled}
           hasBg={hasBg}
           onHome={goHome}
