@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from '@tanstack/react-router'
 import { scrollToId } from './smooth-scroll'
-import { CAL_URL_EXPORT as CAL_URL } from './book-a-call'
+
+/** 15-minute intro call. Booked off-site, so it opens in its own tab. */
+const CAL_URL = 'https://cal.com/tgmlabs/intro-call'
 
 const NAV_ITEMS = [
   { label: 'The Problem', id: 'problem' },
@@ -123,8 +125,7 @@ function MastheadCard({
               </div>
 
               {/* Mobile-only Book a Call button — lives inside the nameplate
-                  so it never overlaps the logo or date text. Hidden on sm+ because
-                  the fixed floating button takes over there. */}
+                  so it never overlaps the logo or date text. */}
               <div className="mt-3 flex justify-center sm:hidden">
                 <a
                   href={CAL_URL}
@@ -151,15 +152,9 @@ function MastheadCard({
             }`}
           >
             <div className="overflow-hidden">
-              {/* Reserves the fixed "Book a call" button's corner so the
-                collapsed bar's right-aligned content (T.G.M. on small screens,
-                the nav from md up) never slides underneath it. Kept in step
-                with that button's fixed width + offset: 112+10 and 152+20,
-                each plus a 10px breathing gap. */}
-              {/* On mobile the fixed floating button is hidden, so we show
-                  the date + a small inline Book a Call button beside T.G.M.
-                  instead of reserving a gutter for the (invisible) fixed one. */}
-              <div className="grid grid-cols-[1fr_auto_1fr] items-center md:pr-[182px]">
+              {/* On mobile we show the date + a small inline Book a Call
+                  button beside T.G.M. */}
+              <div className="grid grid-cols-[1fr_auto_1fr] items-center">
                 <span
                   className={`justify-self-start font-caslon text-[12px] tracking-wide uppercase sm:text-[14px] md:text-[16px] ${
                     dark ? 'text-card-cream' : 'text-ink'

@@ -17,3 +17,5 @@ todos.json
 
 # Local Worker secrets (Google Sheets webhook)
 .dev.vars
+
+graphify-out/
