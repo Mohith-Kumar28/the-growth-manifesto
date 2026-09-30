@@ -1,13 +1,8 @@
-import {
-  HeadContent,
-  Scripts,
-  createRootRoute,
-  useRouterState,
-} from '@tanstack/react-router'
+import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 
-import { ChatformEmbed } from '#/components/growth/chatform'
+import { BookACall } from '#/components/growth/book-a-call'
 import { SITE_NAME, SITE_URL, TAGLINE, absolute, ldScript } from '#/lib/seo'
 import appCss from '../styles.css?url'
 
@@ -125,12 +120,7 @@ export const Route = createRootRoute({
   shellComponent: RootDocument,
 })
 
-/** Routes that render the Chatform form inline, so skip the popup there. */
-const INLINE_FORM_PATHS = new Set(['/founders', '/vc'])
-
 function RootDocument({ children }: { children: React.ReactNode }) {
-  const pathname = useRouterState({ select: (s) => s.location.pathname })
-
   return (
     <html lang="en">
       <head>
@@ -138,10 +128,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         {children}
-        {/* The intake pages embed the form inline instead of the popup. */}
-        {!INLINE_FORM_PATHS.has(pathname.replace(/\/$/, '')) && (
-          <ChatformEmbed />
-        )}
+        <BookACall />
         <TanStackDevtools
           config={{
             position: 'bottom-right',
